@@ -26,19 +26,6 @@ import json
 
 # [END imports]
 
-DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
-
-# We set a parent key on the 'Greetings' to ensure that they are all
-# in the same entity group. Queries across the single entity group
-# will be consistent. However, the write rate should be limited to
-# ~1/second.
-
-def guestbook_key(guestbook_name=DEFAULT_GUESTBOOK_NAME):
-    """Constructs a Datastore key for a Guestbook entity.
-    We use guestbook_name as the key.
-    """
-    return ndb.Key('Guestbook', guestbook_name)
-
 class Stream(ndb.Model):
     """Model a photo stream"""
     name = ndb.StringProperty(indexed=False)
@@ -57,20 +44,6 @@ class Photo(ndb.Model):
     created_at = ndb.DateTimeProperty(auto_now_add=True)
     storage_path = ndb.StringProperty(indexed=False)
 
-# [START greeting]
-class Author(ndb.Model):
-    """Sub model for representing an author."""
-    identity = ndb.StringProperty(indexed=False)
-    email = ndb.StringProperty(indexed=False)
-
-
-class Greeting(ndb.Model):
-    """A main model for representing an individual Guestbook entry."""
-    author = ndb.StructuredProperty(Author)
-    content = ndb.StringProperty(indexed=False)
-    date = ndb.DateTimeProperty(auto_now_add=True)
-# [END greeting]
-
 def default_json_serializer(obj):
     """Default JSON serializer."""
     import calendar, datetime
@@ -84,40 +57,6 @@ def default_json_serializer(obj):
         )
         return millis
     raise TypeError('Not sure how to serialize %s' % (obj,))
-
-# [START guestbook]
-class GuestbookApi(webapp2.RequestHandler):
-
-    def get(self):
-        guestbook_name = self.request.get('guestbook_name',
-                                          DEFAULT_GUESTBOOK_NAME)
-        greetings_query = Greeting.query(
-            ancestor=guestbook_key(guestbook_name)).order(-Greeting.date)
-        greetings = greetings_query.fetch(10)
-
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps([g.to_dict() for g in greetings], default=default_json_serializer))
-
-    def post(self):
-        # We set the same parent key on the 'Greeting' to ensure each
-        # Greeting is in the same entity group. Queries across the
-        # single entity group will be consistent. However, the write
-        # rate to a single entity group should be limited to
-        # ~1/second.
-        guestbook_name = self.request.get('guestbook_name',
-                                          DEFAULT_GUESTBOOK_NAME)
-        greeting = Greeting(parent=guestbook_key(guestbook_name))
-
-        if users.get_current_user():
-            greeting.author = Author(
-                    identity=users.get_current_user().user_id(),
-                    email=users.get_current_user().email())
-
-        greeting.content = self.request.get('content')
-        greeting.put()
-
-        self.response.out.write("ok")
-# [END guestbook]
 
 class MeApi(webapp2.RequestHandler):
 
@@ -135,7 +74,7 @@ class StreamsApi(webapp2.RequestHandler):
         owner_streams = Stream.query_by_owner(users.get_current_user().user_id()).fetch()
 
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps([g.to_dict() for g in owner_streams], default=default_json_serializer))
+        self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id())) for g in owner_streams], default=default_json_serializer))
 
     def post(self):
         # We set the same parent key on the 'Greeting' to ensure each
@@ -149,11 +88,25 @@ class StreamsApi(webapp2.RequestHandler):
 
         self.response.out.write("ok")
 
+class StreamApi(webapp2.RequestHandler):
+
+    def get(self, id):
+        key = ndb.Key('Stream', int(id))
+        stream = key.get()
+
+        if (stream is None):
+            self.response.status = 404
+            self.response.write('stream not found')
+        else:
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(json.dumps(dict(stream.to_dict(), **dict(id=stream.key.id())), default=default_json_serializer))
+            # self.response.out.write(json.dumps(dict(stream.to_dict(), **dict(id=stream.key.id())), default=default_json_serializer))
+
 
 # [START app]
 app = webapp2.WSGIApplication([
-    ('/api/guestbook', GuestbookApi),
-    ('/api/streams', StreamsApi),
-    ('/api/me', MeApi),
+    webapp2.Route(r'/api/streams', StreamsApi),
+    webapp2.Route(r'/api/streams/<id:\d+>', StreamApi),
+    webapp2.Route(r'/api/me', MeApi),
 ], debug=True)
 # [END app]

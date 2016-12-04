@@ -10,7 +10,7 @@
   "scripts": {
     "build": "cd client && npm run build && cd .. && node scripts/build.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "node scripts/deploy.js",
+    "deploy": "npm run build && node scripts/deploy.js",
     "dev:appengine": "python \"C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\dev_appserver.py\" server",
     "dev:webpack": "cd client && npm start",
     "dev": "concurrently --kill-others --names \"appengine,webpack\" --prefix \"[{name}]\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run dev:appengine\" \"npm run dev:webpack\""
