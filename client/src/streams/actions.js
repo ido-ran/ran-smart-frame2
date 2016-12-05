@@ -2,6 +2,9 @@
 export const STREAMS_LOAD_SUCCESS = 'STREAMS_LOAD_SUCCESS'
 export const STREAMS_LOAD_FAIL = 'STREAMS_LOAD_FAIL'
 
+export const STREAM_LOAD_SUCCESS = 'STREAM_LOAD_SUCCESS'
+export const STREAM_LOAD_FAIL = 'STREAM_LOAD_FAIL'
+
 function streamsLoadSuccess(streams) {
   return {
     type: STREAMS_LOAD_SUCCESS,
@@ -32,5 +35,39 @@ export function loadStreams() {
       }
     })
     .catch(error => dispatch(streamsLoadFail(error)))
+  }
+}
+
+function streamLoadSuccess(stream) {
+  return {
+    type: STREAM_LOAD_SUCCESS,
+    payload: stream
+  }
+}
+
+function streamLoadFail(streamId, error) {
+  return {
+    type: STREAM_LOAD_FAIL,
+    streamId,
+    error
+  }
+}
+
+export function loadStream(streamId) {
+  return dispatch => {
+    fetch(`/api/streams/${streamId}`, {
+      credentials: 'include'
+    })
+    .then(function(response) {
+      var contentType = response.headers.get("content-type")
+      if(response.ok && contentType && contentType.indexOf("application/json") !== -1) {
+        return response.json().then(function(json) {
+          dispatch(streamLoadSuccess(json))
+        });
+      } else {
+        dispatch(streamLoadFail(streamId))
+      }
+    })
+    .catch(error => dispatch(streamsLoadFail(streamId, error)))
   }
 }

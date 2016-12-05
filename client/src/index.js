@@ -7,6 +7,7 @@ import { getUserInfo } from './loginActions'
 import App from './App';
 import Home from './Home';
 import Streams from './streams/Streams'
+import Stream from './streams/Stream'
 import './index.css';
 
 let store = configStore();
@@ -18,6 +19,7 @@ ReactDOM.render(
         <Route path="/" component={App}>
           <IndexRoute component={Home}/>
           <Route path="/streams" component={Streams} />
+          <Route path="/streams/:streamId" component={Stream} />
         </Route>
       </Router>
     </Provider>,

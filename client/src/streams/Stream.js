@@ -3,9 +3,9 @@ import { Link  } from 'react-router'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 
-import { loadStreams } from './actions'
+import { loadStream } from './actions'
 
-class Streams extends Component {
+class Stream extends Component {
 
   constructor() {
     super()
@@ -16,19 +16,13 @@ class Streams extends Component {
   }
 
   componentWillMount() {
-    this.props.loadStreams()
+    this.props.loadStream(this.props.params.streamId)
   }
 
   render() {
     return (
       <div>
-        <h1>Stream</h1>
-        <ul>
-        {this.props.streams.items.map(stream => (
-          <li key={`stream${stream.name}`}><Link to={`/streams/${stream.id}`}>{stream.name}</Link></li>
-        ))}
-        </ul>
-
+        <h1>{this.props.stream.name}</h1>
         <form onSubmit={this.handleSubmit}>
           <div>Create New Stream</div>
           <input type="text" value={this.state.newStreamName} onChange={this.handleChange} />
@@ -63,16 +57,17 @@ class Streams extends Component {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({loadStreams}, dispatch);
+    return bindActionCreators({loadStream}, dispatch);
 }
 
 function mapStateToProps(state) {
     return {
-        streams: state.streams
+        stream: state.stream.item,
+        isLoaded: state.stream.isLoaded
     };
 }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Streams)
+)(Stream)
