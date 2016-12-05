@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Streams from './streams/Streams'
+import { Link  } from 'react-router'
 import './App.css';
 
 class App extends Component {
@@ -27,7 +27,13 @@ class App extends Component {
 
   render() {
     return (
-      <Streams />
+      <div>
+        <div>Welcome to RanFrame</div>
+        <Link to="/">Home</Link>
+        <Link to="/streams">Streams</Link>
+        <Link to="/frames">Frames</Link>
+        {this.props.children}
+      </div>
     );
   }
 }
