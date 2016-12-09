@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Link  } from 'react-router'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 
-import { loadStream } from './actions'
+import { loadStream, loadStreamPhotos } from './actions'
+import ImageUplaod from './ImageUpload'
 
 class Stream extends Component {
 
@@ -11,44 +11,47 @@ class Stream extends Component {
     super()
     this.state = {newStreamName: ''}
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this._loadStreamPhotos = this._loadStreamPhotos.bind(this)
   }
 
   componentWillMount() {
     this.props.loadStream(this.props.params.streamId)
+    this._loadStreamPhotos();
+  }
+
+  _loadStreamPhotos() {
+    this.props.loadStreamPhotos(this.props.params.streamId)
   }
 
   render() {
     return (
       <div>
         <h1>{this.props.stream.name}</h1>
-        <form onSubmit={this.handleSubmit}>
-          <div>Create New Stream</div>
-          <input type="text" value={this.state.newStreamName} onChange={this.handleChange} />
-          <input type="submit" value="Submit" />
-        </form>
+        <ImageUplaod onUpload={(file) => this.handleUpload(file)} />
+
+        <ul>
+        {
+          this.props.photos.map(photo => {
+            return (
+              <li key={photo.id}><img alt="thumbnail" src={`data:image/png;base64,${photo.thumbnail}`} /></li>
+            )
+          })
+        }
+        </ul>
       </div>)
   }
 
 
-  handleChange(event) {
-    this.setState({newStreamName: event.target.value});
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-
-    const {newStreamName} = this.state;
+  handleUpload(file) {
     var form = new FormData();
-    form.append('name', newStreamName)
+    form.append("image", file, "filename.txt");
 
-    fetch("/api/streams", {
+    fetch(`/api/streams/${this.props.params.streamId}/photos`, {
       method: "POST",
       body: form,
       credentials: 'include'
     }).then(() => {
-      setTimeout(this.props.loadStreams, 500)
+      setTimeout(this._loadStreamPhotos, 500)
     });
 
     this.setState({newStreamName: ''})
@@ -57,13 +60,14 @@ class Stream extends Component {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({loadStream}, dispatch);
+    return bindActionCreators({loadStream, loadStreamPhotos}, dispatch);
 }
 
 function mapStateToProps(state) {
     return {
         stream: state.stream.item,
-        isLoaded: state.stream.isLoaded
+        isLoaded: state.stream.isLoaded,
+        photos: state.stream.photos
     };
 }
 

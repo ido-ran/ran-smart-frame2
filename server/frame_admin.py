@@ -17,12 +17,15 @@
 # [START imports]
 import os
 import urllib
+import logging
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.api import images
 
 import webapp2
 import json
+import base64
 
 # [END imports]
 
@@ -43,11 +46,13 @@ class Photo(ndb.Model):
     created_by_user_id = ndb.StringProperty(indexed=True)
     created_at = ndb.DateTimeProperty(auto_now_add=True)
     storage_path = ndb.StringProperty(indexed=False)
+    thumbnail = ndb.BlobProperty()
 
 def default_json_serializer(obj):
     """Default JSON serializer."""
     import calendar, datetime
 
+    logging.info('serializing %s' % obj)
     if isinstance(obj, datetime.datetime):
         if obj.utcoffset() is not None:
             obj = obj - obj.utcoffset()
@@ -102,11 +107,33 @@ class StreamApi(webapp2.RequestHandler):
             self.response.out.write(json.dumps(dict(stream.to_dict(), **dict(id=stream.key.id())), default=default_json_serializer))
             # self.response.out.write(json.dumps(dict(stream.to_dict(), **dict(id=stream.key.id())), default=default_json_serializer))
 
+class PhotosApi(webapp2.RequestHandler):
+
+    def get(self, stream_id):
+        stream_key = ndb.Key('Stream', int(stream_id))
+
+        photos_query = Photo.query(ancestor=stream_key)
+        photos = photos_query.fetch(10)
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id(), thumbnail=base64.b64encode(g.thumbnail))) for g in photos], default=default_json_serializer))
+
+    def post(self, stream_id):
+        stream_key = ndb.Key('Stream', int(stream_id))
+
+        img = self.request.get('image')
+        img = images.resize(img, 200, 200)
+
+        photo = Photo(parent = stream_key, created_by_user_id=users.get_current_user().user_id(), thumbnail=img)
+        photo.put()
+
+        self.response.out.write("ok")
 
 # [START app]
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/streams', StreamsApi),
-    webapp2.Route(r'/api/streams/<id:\d+>', StreamApi),
+    webapp2.Route(r'/api/streams/<id>', StreamApi),
+    webapp2.Route(r'/api/streams/<stream_id>/photos', PhotosApi),
     webapp2.Route(r'/api/me', MeApi),
 ], debug=True)
 # [END app]

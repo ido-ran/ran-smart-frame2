@@ -29,9 +29,11 @@ class App extends Component {
     return (
       <div>
         <div>Welcome to RanFrame</div>
-        <Link to="/">Home</Link>
-        <Link to="/streams">Streams</Link>
-        <Link to="/frames">Frames</Link>
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/streams">Streams</Link></li>
+          <li><Link to="/frames">Frames</Link></li>
+        </ul>
         {this.props.children}
       </div>
     );
