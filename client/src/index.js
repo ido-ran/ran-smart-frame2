@@ -8,6 +8,7 @@ import App from './App';
 import Home from './Home';
 import Streams from './streams/Streams'
 import Stream from './streams/Stream'
+import Photo from './streams/Photo'
 import './index.css';
 
 let store = configStore();
@@ -20,6 +21,7 @@ ReactDOM.render(
           <IndexRoute component={Home}/>
           <Route path="/streams" component={Streams} />
           <Route path="/streams/:streamId" component={Stream} />
+          <Route path="/streams/:streamId/photos/:photoId" component={Photo} />
         </Route>
       </Router>
     </Provider>,

@@ -23,7 +23,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.api import images
 
-import lib.cloudstorage as gcs
+import cloudstorage as gcs
 import os
 from google.appengine.api import app_identity
 
@@ -126,27 +126,27 @@ class PhotosApi(webapp2.RequestHandler):
     def post(self, stream_id):
         stream_key = ndb.Key('Stream', int(stream_id))
 
-        img = self.request.get('image')
-        thumbnail = images.resize(img, 200, 200)
+        img_field = self.request.POST.get('image')
+        uploaded_file_content = img_field.file.read()
+        uploaded_file_type = img_field.type
+        thumbnail = images.resize(uploaded_file_content, 200, 200)
 
         crc32_func = crcmod.predefined.mkCrcFun('crc-32c')
-        checksum = crc32_func(img)
+        checksum = crc32_func(uploaded_file_content)
         logging.info("checksum 10:{0} hex:{0:x}".format(checksum))
 
         bucket_name = os.environ.get('BUCKET_NAME',
                                      app_identity.get_default_gcs_bucket_name())
 
         filename = "/{0}/pics/{1:x}.png".format(bucket_name, checksum)
-        self.response.write('Creating file %s\n' % filename)
 
         write_retry_params = gcs.RetryParams(backoff_factor=1.1)
         gcs_file = gcs.open(filename,
                             'w',
-                            content_type='text/plain',
-                            options={'x-goog-meta-foo': 'foo',
-                                     'x-goog-meta-bar': 'bar'},
+                            content_type=uploaded_file_type,
+                            options={'x-goog-meta-crc32c': "{0:x}".format(checksum)},
                             retry_params=write_retry_params)
-        gcs_file.write(img)
+        gcs_file.write(uploaded_file_content)
         gcs_file.close()
 
         photo = Photo(
@@ -157,6 +157,30 @@ class PhotosApi(webapp2.RequestHandler):
         photo.put()
 
         self.response.out.write("ok")
+
+class PhotoApi(webapp2.RequestHandler):
+
+    def get(self, stream_id, photo_id):
+        stream_key = ndb.Key('Stream', int(stream_id))
+        photo_key = ndb.Key('Photo', int(photo_id), parent=stream_key)
+        photo = photo_key.get()
+
+        bucket_name = os.environ.get('BUCKET_NAME',
+                                     app_identity.get_default_gcs_bucket_name())
+
+        filename = "/{0}/pics/{1:x}.png".format(bucket_name, photo.crc32c)
+
+        try:
+            file_stat = gcs.stat(filename)
+            gcs_file = gcs.open(filename)
+            self.response.headers['Content-Type'] = file_stat.content_type
+            self.response.write(gcs_file.read())
+            gcs_file.close()
+
+        except gcs.NotFoundError:
+            self.response.status = 404
+            self.response.write('photo not found')
+
 
 class TestApi(webapp2.RequestHandler):
     def get(self):
@@ -214,6 +238,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/streams', StreamsApi),
     webapp2.Route(r'/api/streams/<id>', StreamApi),
     webapp2.Route(r'/api/streams/<stream_id>/photos', PhotosApi),
+    webapp2.Route(r'/api/streams/<stream_id>/photos/<photo_id>', PhotoApi),
     webapp2.Route(r'/api/me', MeApi),
     webapp2.Route(r'/api/test', TestApi),
     webapp2.Route(r'/api/test/write', TestWriteApi),
