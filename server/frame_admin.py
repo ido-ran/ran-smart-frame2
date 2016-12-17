@@ -23,6 +23,11 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.api import images
 
+import lib.cloudstorage as gcs
+import os
+from google.appengine.api import app_identity
+
+import crcmod
 import webapp2
 import json
 import base64
@@ -47,12 +52,12 @@ class Photo(ndb.Model):
     created_at = ndb.DateTimeProperty(auto_now_add=True)
     storage_path = ndb.StringProperty(indexed=False)
     thumbnail = ndb.BlobProperty()
+    crc32c = ndb.IntegerProperty(indexed=False)
 
 def default_json_serializer(obj):
     """Default JSON serializer."""
     import calendar, datetime
 
-    logging.info('serializing %s' % obj)
     if isinstance(obj, datetime.datetime):
         if obj.utcoffset() is not None:
             obj = obj - obj.utcoffset()
@@ -122,12 +127,87 @@ class PhotosApi(webapp2.RequestHandler):
         stream_key = ndb.Key('Stream', int(stream_id))
 
         img = self.request.get('image')
-        img = images.resize(img, 200, 200)
+        thumbnail = images.resize(img, 200, 200)
 
-        photo = Photo(parent = stream_key, created_by_user_id=users.get_current_user().user_id(), thumbnail=img)
+        crc32_func = crcmod.predefined.mkCrcFun('crc-32c')
+        checksum = crc32_func(img)
+        logging.info("checksum 10:{0} hex:{0:x}".format(checksum))
+
+        bucket_name = os.environ.get('BUCKET_NAME',
+                                     app_identity.get_default_gcs_bucket_name())
+
+        filename = "/{0}/pics/{1:x}.png".format(bucket_name, checksum)
+        self.response.write('Creating file %s\n' % filename)
+
+        write_retry_params = gcs.RetryParams(backoff_factor=1.1)
+        gcs_file = gcs.open(filename,
+                            'w',
+                            content_type='text/plain',
+                            options={'x-goog-meta-foo': 'foo',
+                                     'x-goog-meta-bar': 'bar'},
+                            retry_params=write_retry_params)
+        gcs_file.write(img)
+        gcs_file.close()
+
+        photo = Photo(
+                      parent = stream_key,
+                      created_by_user_id=users.get_current_user().user_id(),
+                      thumbnail=thumbnail,
+                      crc32c=checksum)
         photo.put()
 
         self.response.out.write("ok")
+
+class TestApi(webapp2.RequestHandler):
+    def get(self):
+      bucket_name = os.environ.get('BUCKET_NAME',
+                                   app_identity.get_default_gcs_bucket_name())
+
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.response.write('Demo GCS Application running from Version: '
+                          + os.environ['CURRENT_VERSION_ID'] + '\n')
+      self.response.write('Using bucket name: ' + bucket_name + '\n\n')
+
+class TestWriteApi(webapp2.RequestHandler):
+    def get(self):
+      """Create a file.
+
+      The retry_params specified in the open call will override the default
+      retry params for this particular file handle.
+
+      Args:
+        filename: filename.
+      """
+      bucket_name = os.environ.get('BUCKET_NAME',
+                                   app_identity.get_default_gcs_bucket_name())
+
+
+
+      filename = '/%s/main/sub/test-file' % bucket_name
+      self.response.write('Creating file %s\n' % filename)
+
+      write_retry_params = gcs.RetryParams(backoff_factor=1.1)
+      gcs_file = gcs.open(filename,
+                          'w',
+                          content_type='text/plain',
+                          options={'x-goog-meta-foo': 'foo',
+                                   'x-goog-meta-bar': 'bar'},
+                          retry_params=write_retry_params)
+      gcs_file.write('abcde\n')
+      gcs_file.write('xyz\n')
+      gcs_file.close()
+
+class TestReadApi(webapp2.RequestHandler):
+    def get(self):
+      bucket_name = os.environ.get('BUCKET_NAME',
+                                   app_identity.get_default_gcs_bucket_name())
+
+      filename = '/%s/main/sub/test-file' % bucket_name
+      self.response.write('Abbreviated file content (first line and last 1K):\n')
+
+      gcs_file = gcs.open(filename)
+      self.response.write(gcs_file.read())
+      gcs_file.close()
 
 # [START app]
 app = webapp2.WSGIApplication([
@@ -135,5 +215,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/streams/<id>', StreamApi),
     webapp2.Route(r'/api/streams/<stream_id>/photos', PhotosApi),
     webapp2.Route(r'/api/me', MeApi),
+    webapp2.Route(r'/api/test', TestApi),
+    webapp2.Route(r'/api/test/write', TestWriteApi),
+    webapp2.Route(r'/api/test/read', TestReadApi),
 ], debug=True)
 # [END app]
