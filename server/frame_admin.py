@@ -260,6 +260,20 @@ class FramesApi(webapp2.RequestHandler):
 
         self.response.out.write("ok")
 
+class FrameApi(webapp2.RequestHandler):
+
+    def get(self, id):
+        key = ndb.Key('Frame', int(id))
+        frame = key.get()
+
+        if (frame is None):
+            self.response.status = 404
+            self.response.write('frame not found')
+        else:
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(json.dumps(dict(frame.to_dict(), **dict(id=frame.key.id())), default=default_json_serializer))
+            # self.response.out.write(json.dumps(dict(stream.to_dict(), **dict(id=stream.key.id())), default=default_json_serializer))
+
 
 # [START app]
 app = webapp2.WSGIApplication([
@@ -269,6 +283,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/streams/<stream_id>/photos/<photo_id>', PhotoApi),
     webapp2.Route(r'/api/me', MeApi),
     webapp2.Route(r'/api/frames', FramesApi),
+    webapp2.Route(r'/api/frames/<id>', FrameApi),
     webapp2.Route(r'/api/test', TestApi),
     webapp2.Route(r'/api/test/write', TestWriteApi),
     webapp2.Route(r'/api/test/read', TestReadApi),

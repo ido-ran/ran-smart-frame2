@@ -86,7 +86,7 @@ export function loadStream(streamId) {
         dispatch(streamLoadFail(streamId))
       }
     })
-    .catch(error => dispatch(streamsLoadFail(streamId, error)))
+    .catch(error => dispatch(streamLoadFail(streamId, error)))
   }
 }
 
