@@ -54,6 +54,18 @@ class Photo(ndb.Model):
     thumbnail = ndb.BlobProperty()
     crc32c = ndb.IntegerProperty(indexed=False)
 
+class Frame(ndb.Model):
+    """Model a digital frame"""
+    name = ndb.StringProperty(indexed=False)
+    created_by_user_id = ndb.StringProperty(indexed=True)
+    created_at = ndb.DateTimeProperty(auto_now_add=True)
+    updated_at = ndb.DateTimeProperty(auto_now=True)
+
+    @classmethod
+    def query_by_owner(cls, user_id):
+        return cls.query(cls.created_by_user_id == user_id).order(-cls.updated_at)
+
+
 def default_json_serializer(obj):
     """Default JSON serializer."""
     import calendar, datetime
@@ -233,6 +245,22 @@ class TestReadApi(webapp2.RequestHandler):
       self.response.write(gcs_file.read())
       gcs_file.close()
 
+class FramesApi(webapp2.RequestHandler):
+
+    def get(self):
+        owner_frames = Frame.query_by_owner(users.get_current_user().user_id()).fetch()
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id())) for g in owner_frames], default=default_json_serializer))
+
+    def post(self):
+        name = self.request.get('name')
+        frame = Frame(name = name, created_by_user_id=users.get_current_user().user_id())
+        frame.put()
+
+        self.response.out.write("ok")
+
+
 # [START app]
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/streams', StreamsApi),
@@ -240,6 +268,7 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/streams/<stream_id>/photos', PhotosApi),
     webapp2.Route(r'/api/streams/<stream_id>/photos/<photo_id>', PhotoApi),
     webapp2.Route(r'/api/me', MeApi),
+    webapp2.Route(r'/api/frames', FramesApi),
     webapp2.Route(r'/api/test', TestApi),
     webapp2.Route(r'/api/test/write', TestWriteApi),
     webapp2.Route(r'/api/test/read', TestReadApi),

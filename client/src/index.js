@@ -9,6 +9,7 @@ import Home from './Home';
 import Streams from './streams/Streams'
 import Stream from './streams/Stream'
 import Photo from './streams/Photo'
+import Frames from './frames/Frames'
 import './index.css';
 
 let store = configStore();
@@ -22,6 +23,8 @@ ReactDOM.render(
           <Route path="/streams" component={Streams} />
           <Route path="/streams/:streamId" component={Stream} />
           <Route path="/streams/:streamId/photos/:photoId" component={Photo} />
+
+          <Route path="/frames" component={Frames} />
         </Route>
       </Router>
     </Provider>,
