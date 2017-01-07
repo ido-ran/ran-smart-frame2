@@ -5,7 +5,6 @@ export const FRAMEMS_LOAD_FAIL = 'FRAMEMS_LOAD_FAIL'
 export const FRAME_LOAD_SUCCESS = 'FRAME_LOAD_SUCCESS'
 export const FRAME_LOAD_FAIL = 'FRAME_LOAD_FAIL'
 
-
 function framesLoadSuccess(frames) {
   return {
     type: FRAMES_LOAD_SUCCESS,
@@ -70,5 +69,37 @@ export function loadFrame(frameId) {
       }
     })
     .catch(error => dispatch(frameLoadFail(frameId, error)))
+  }
+}
+
+export function linkStreamToFrame(streamId, frameId) {
+  return dispatch => {
+    var form = new FormData();
+    form.append('stream_id', streamId)
+
+    fetch(`/api/frames/${frameId}/streams`, {
+      method: "POST",
+      body: form,
+      credentials: 'include'
+    })
+    .then(function(response) {
+      if(response.ok) {
+        dispatch(loadFrame(frameId))
+      }
+    })
+  }
+}
+
+export function unlinkStreamToFrame(streamId, frameId) {
+  return dispatch => {
+    fetch(`/api/frames/${frameId}/streams/${streamId}`, {
+      method: "DELETE",
+      credentials: 'include'
+    })
+    .then(function(response) {
+      if(response.ok) {
+        dispatch(loadFrame(frameId))
+      }
+    })
   }
 }
