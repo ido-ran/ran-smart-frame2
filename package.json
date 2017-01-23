@@ -4,7 +4,7 @@
   "description": "Digital picture frame platform",
   "main": "index.js",
   "appEngine": {
-    "project": "ran-frame",
+    "project": "ran-frame2",
     "version": "1"
   },
   "scripts": {
