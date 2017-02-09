@@ -23,8 +23,14 @@ class PhotosApi(webapp2.RequestHandler):
         photos_query = Photo.query(ancestor=stream_key)
         photos = photos_query.fetch(10)
 
+        include_thumbnail = self.request.get('include_thumbnail')
+
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id(), thumbnail=base64.b64encode(g.thumbnail))) for g in photos], default=default_json_serializer))
+
+        if (include_thumbnail):
+            self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id(), thumbnail=base64.b64encode(g.thumbnail))) for g in photos], default=default_json_serializer))
+        else:
+            self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id(), thumbnail='')) for g in photos], default=default_json_serializer))        
 
     def post(self, stream_id):
         stream_key = ndb.Key('Stream', int(stream_id))
@@ -77,6 +83,8 @@ class PhotoApi(webapp2.RequestHandler):
             file_stat = gcs.stat(filename)
             gcs_file = gcs.open(filename)
             self.response.headers['Content-Type'] = file_stat.content_type
+            self.response.headers['Cache-Control'] = 'private, max-age=31536000' # cache for upto 1 year
+            self.response.headers['ETag'] = file_stat.etag
             self.response.write(gcs_file.read())
             gcs_file.close()
 
