@@ -4,7 +4,6 @@ import os
 import urllib
 
 from google.appengine.api import users
-from google.appengine.ext import ndb
 
 import webapp2
 import json
@@ -17,6 +16,7 @@ from api.streams import StreamsApi, StreamApi
 from api.photos import PhotosApi, PhotoApi
 from api.frames import FramesApi, FrameApi
 from api.frame_streams import FrameStreamsApi, FrameStreamApi
+from api.public import PublicApi
 
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/streams', StreamsApi),
@@ -28,4 +28,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/frames/<id>', FrameApi),
     webapp2.Route(r'/api/frames/<frame_id>/streams', FrameStreamsApi),
     webapp2.Route(r'/api/frames/<frame_id>/streams/<stream_id>', FrameStreamApi),
+    webapp2.Route(r'/public/api/frames/<id>', PublicApi),
 ], debug=True)

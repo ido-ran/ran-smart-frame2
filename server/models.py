@@ -20,6 +20,11 @@ class Photo(ndb.Model):
     thumbnail = ndb.BlobProperty()
     crc32c = ndb.IntegerProperty(indexed=False)
 
+    def serialize(self):
+        return {
+            'id': self.key.id()
+        }
+
 class Frame(ndb.Model):
     """Model a digital frame"""
     name = ndb.StringProperty(indexed=False)
@@ -27,6 +32,7 @@ class Frame(ndb.Model):
     created_at = ndb.DateTimeProperty(auto_now_add=True)
     updated_at = ndb.DateTimeProperty(auto_now=True)
     streams = ndb.KeyProperty(kind=Stream, repeated=True)
+    access_key = ndb.StringProperty(indexed=True)
 
     @classmethod
     def query_by_owner(cls, user_id):
@@ -35,5 +41,6 @@ class Frame(ndb.Model):
     def serialize(self):
         return {
             'id': self.key.id(),
-            'name': self.name
+            'name': self.name,
+            'access_key': self.access_key
         }

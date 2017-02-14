@@ -1,10 +1,12 @@
 import webapp2
 import json
+import string
+import random
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-from serializers import default_json_serializer
+from serializers import default_json_serializer, clone_for_json
 from models import Frame
 
 class FramesApi(webapp2.RequestHandler):
@@ -17,29 +19,19 @@ class FramesApi(webapp2.RequestHandler):
 
     def post(self):
         name = self.request.get('name')
-        frame = Frame(name = name, created_by_user_id=users.get_current_user().user_id())
+        frame = Frame(
+                    name = name,
+                    created_by_user_id=users.get_current_user().user_id(),
+                    access_key=self.generate_random_string(40)
+                    )
         frame.put()
 
         self.response.out.write("ok")
 
-# I'll use this method to serialize objects instead of the complex json.dumps.
-# this seem to be more compsable, still not the best.
-def clone_for_json(obj):
-    import calendar, datetime
-    clone = obj.to_dict()
-    for attr, val in clone.items():
-        # logging.info("attr {0} type:{1}".format(attr, type(val)))
-        if (isinstance(val, datetime.datetime)):
-            clone[attr] = int(
-                calendar.timegm(val.timetuple()) * 1000 +
-                val.microsecond / 1000
-            )
-        elif (isinstance(val, ndb.Key)):
-            clone[attr] = val.id()
-
-    # Add the entity numeric id.
-    clone['id'] = obj.key.id()
-    return clone
+    @staticmethod
+    def generate_random_string(n):
+        chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+        return ''.join(random.SystemRandom().choice(chars) for _ in range(n))
 
 class FrameApi(webapp2.RequestHandler):
 
