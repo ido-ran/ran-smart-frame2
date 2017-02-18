@@ -14,6 +14,7 @@ import cloudstorage as gcs
 
 from serializers import default_json_serializer
 from models import Photo
+from photo_storage import read_photo_from_storage
 
 class PhotosApi(webapp2.RequestHandler):
 
@@ -30,7 +31,7 @@ class PhotosApi(webapp2.RequestHandler):
         if (include_thumbnail):
             self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id(), thumbnail=base64.b64encode(g.thumbnail))) for g in photos], default=default_json_serializer))
         else:
-            self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id(), thumbnail='')) for g in photos], default=default_json_serializer))        
+            self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id(), thumbnail='')) for g in photos], default=default_json_serializer))
 
     def post(self, stream_id):
         stream_key = ndb.Key('Stream', int(stream_id))
@@ -77,17 +78,4 @@ class PhotoApi(webapp2.RequestHandler):
         bucket_name = os.environ.get('BUCKET_NAME',
                                      app_identity.get_default_gcs_bucket_name())
 
-        filename = "/{0}/pics/{1:x}.png".format(bucket_name, photo.crc32c)
-
-        try:
-            file_stat = gcs.stat(filename)
-            gcs_file = gcs.open(filename)
-            self.response.headers['Content-Type'] = file_stat.content_type
-            self.response.headers['Cache-Control'] = 'private, max-age=31536000' # cache for upto 1 year
-            self.response.headers['ETag'] = file_stat.etag
-            self.response.write(gcs_file.read())
-            gcs_file.close()
-
-        except gcs.NotFoundError:
-            self.response.status = 404
-            self.response.write('photo not found')
+        read_photo_from_storage(photo, self.response)

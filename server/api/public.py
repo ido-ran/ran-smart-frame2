@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 
 from serializers import clone_for_json
 from models import Frame, Photo
+from photo_storage import read_photo_from_storage
 
 class PublicApi(webapp2.RequestHandler):
 
@@ -41,27 +42,31 @@ class PublicApi(webapp2.RequestHandler):
         serialized_stream['photos'] = PublicApi.fetch_photos(stream.key)
         return serialized_stream
 
-class PublicPhotoApiTODO(webapp2.RequestHandler):
+class PublicPhotoApi(webapp2.RequestHandler):
 
     def get(self, frame_id, stream_id, photo_id):
+        access_key = self.request.get('access_key')
         stream_key = ndb.Key('Stream', int(stream_id))
+
+        frame_key = ndb.Key('Frame', int(frame_id))
+        frame = frame_key.get()
+
+        if (frame is None or frame.access_key != access_key):
+            self.response.status = 404
+            self.response.write('frame not found')
+            return
+
+        if (not stream_key in frame.streams):
+            self.response.status = 404
+            self.response.write('frame not found')
+            return
+
         photo_key = ndb.Key('Photo', int(photo_id), parent=stream_key)
         photo = photo_key.get()
 
-        bucket_name = os.environ.get('BUCKET_NAME',
-                                     app_identity.get_default_gcs_bucket_name())
-
-        filename = "/{0}/pics/{1:x}.png".format(bucket_name, photo.crc32c)
-
-        try:
-            file_stat = gcs.stat(filename)
-            gcs_file = gcs.open(filename)
-            self.response.headers['Content-Type'] = file_stat.content_type
-            self.response.headers['Cache-Control'] = 'private, max-age=31536000' # cache for upto 1 year
-            self.response.headers['ETag'] = file_stat.etag
-            self.response.write(gcs_file.read())
-            gcs_file.close()
-
-        except gcs.NotFoundError:
+        if (photo is None):
             self.response.status = 404
-            self.response.write('photo not found')
+            self.response.write('picture not found')
+            return
+
+        read_photo_from_storage(photo, self.response)

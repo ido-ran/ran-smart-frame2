@@ -16,7 +16,7 @@ from api.streams import StreamsApi, StreamApi
 from api.photos import PhotosApi, PhotoApi
 from api.frames import FramesApi, FrameApi
 from api.frame_streams import FrameStreamsApi, FrameStreamApi
-from api.public import PublicApi
+from api.public import PublicApi, PublicPhotoApi
 
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/streams', StreamsApi),
@@ -28,5 +28,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/api/frames/<id>', FrameApi),
     webapp2.Route(r'/api/frames/<frame_id>/streams', FrameStreamsApi),
     webapp2.Route(r'/api/frames/<frame_id>/streams/<stream_id>', FrameStreamApi),
+
     webapp2.Route(r'/public/api/frames/<id>', PublicApi),
+    webapp2.Route(r'/public/api/frames/<frame_id>/streams/<stream_id>/photos/<photo_id>', PublicPhotoApi),
+
 ], debug=True)
