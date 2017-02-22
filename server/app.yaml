@@ -6,6 +6,14 @@ handlers:
 - url: /public/api/(.*)
   script: frame_admin.app
 
+- url: /public
+  static_files: www_public/index.html
+  upload: www_public/index.html
+
+- url: /public/(.*)
+  static_files: www_public/\1
+  upload: www_public/(.*)
+
 - url: /api/(.*)
   script: frame_admin.app
   login: required
@@ -13,10 +21,12 @@ handlers:
 - url: /
   static_files: www/index.html
   upload: www/index.html
+  login: required
 
 - url: /(.*)
   static_files: www/\1
   upload: www/(.*)
+  login: required
 
 libraries:
 - name: PIL
