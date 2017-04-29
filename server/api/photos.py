@@ -39,8 +39,28 @@ class PhotosApi(webapp2.RequestHandler):
         img_field = self.request.POST.get('image')
         uploaded_file_content = img_field.file.read()
         uploaded_file_type = img_field.type
-        thumbnail = images.resize(uploaded_file_content, 200, 200)
 
+        # Process the image by rotating it 0 degress in order to fix
+        # the image orientation based on EXIF data.
+        process_image = images.Image(image_data=uploaded_file_content)
+        process_image.set_correct_orientation(images.CORRECT_ORIENTATION)
+        process_image.rotate(0)
+        process_image_content = process_image.execute_transforms(parse_source_metadata=True)
+        logging.info("image metadata {0}".format(process_image.get_original_metadata()))
+
+        # If the processed image actually was rotated because of EXIF orientation
+        # we use the processed image, otherwise we use the original file content.
+        if ('Orientation' in process_image.get_original_metadata() and
+            process_image.get_original_metadata()['Orientation'] in [3, 6, 8]):
+            image_content_to_save = process_image_content
+            logging.info('using processed image')
+        else:
+            image_content_to_save = uploaded_file_content
+            logging.info('using original image')
+
+        thumbnail = images.resize(image_content_to_save, 200, 200)
+
+        # even if we process the file we calc the crc using original upload content.
         crc32_func = crcmod.predefined.mkCrcFun('crc-32c')
         checksum = crc32_func(uploaded_file_content)
         logging.info("checksum 10:{0} hex:{0:x}".format(checksum))
@@ -56,7 +76,7 @@ class PhotosApi(webapp2.RequestHandler):
                             content_type=uploaded_file_type,
                             options={'x-goog-meta-crc32c': "{0:x}".format(checksum)},
                             retry_params=write_retry_params)
-        gcs_file.write(uploaded_file_content)
+        gcs_file.write(image_content_to_save)
         gcs_file.close()
 
         photo = Photo(
