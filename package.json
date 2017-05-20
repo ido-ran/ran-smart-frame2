@@ -13,7 +13,9 @@
     "deploy": "npm run build && node scripts/deploy.js",
     "dev:appengine": "python \"C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\dev_appserver.py\" server",
     "dev:webpack": "cd client && npm start",
-    "start": "concurrently --kill-others --names \"appengine,webpack\" --prefix \"[{name}]\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run dev:appengine\" \"npm run dev:webpack\""
+    "dev:frame-client": "cd frame-client && npm start",
+    "dev:frame": "concurrently --kill-others --names \"appengine,frame\" --prefix \"[{name}]\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev:appengine\" \"npm run dev:frame-client\"",
+    "start": "concurrently --kill-others --names \"appengine,admin,frame\" --prefix \"[{name}]\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run dev:appengine\" \"npm run dev:webpack\" \"npm run dev:frame-client\""
   },
   "keywords": [
     "appengine",
