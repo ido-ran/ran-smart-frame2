@@ -3,7 +3,7 @@ module Update exposing ( update )
 import RemoteData exposing (WebData)
 
 import Msgs exposing (..)
-import Models exposing (Model, DisplayPhoto, GetFrameResponse)
+import Models exposing (Model, DisplayPhoto, GetFrameResponse, FrameIdentification)
 import Commands exposing (getFrameStreams)
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -12,18 +12,31 @@ update msg model =
     MorePlease ->
       (model, getFrameStreams model.frameIdentification)
 
-    -- NewGif (Ok newUrl) ->
-    --   (Model model.topic newUrl, Cmd.none)
-    --
-    -- NewGif (Err _) ->
-    --   (model, Cmd.none)
 
     OnFetchFrame response ->
-      ( { model | streams = response, photos = collectPhotos response } , Cmd.none)
+      ( { model | streams = response, photos = collectPhotos model.frameIdentification response } , Cmd.none)
 
 
-collectPhotos : WebData GetFrameResponse -> List DisplayPhoto
-collectPhotos response =
+    TimerTick t ->
+      let
+        _ = Debug.log "timer" model.currentPhoto
+        photos = if 0 == List.length model.nextPhotos then model.photos else model.nextPhotos
+        head = List.head photos
+        tail = List.tail photos
+      in
+        ( { model | currentPhoto = head, nextPhotos = getNextPhotos tail }, Cmd.none )
+
+getNextPhotos : Maybe (List DisplayPhoto) -> List DisplayPhoto
+getNextPhotos maybePhotos =
+  case maybePhotos of
+    Nothing ->
+      []
+
+    Just photos ->
+      photos
+
+collectPhotos : FrameIdentification -> WebData GetFrameResponse -> List DisplayPhoto
+collectPhotos frameIdentification response =
     case response of
         RemoteData.NotAsked ->
             []
@@ -38,8 +51,8 @@ collectPhotos response =
               List.map (\photo -> {
                 stream = stream
                 , photo = photo
-                , frame = 72
-                , accessKey = "lets find where" }) stream.photos) []
+                , frame = frameIdentification.frameId
+                , accessKey = frameIdentification.accessKey }) stream.photos) []
 
         RemoteData.Failure error ->
             []

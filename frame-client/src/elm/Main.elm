@@ -6,10 +6,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import RemoteData exposing (WebData)
+import Time exposing (Time)
 
 import Msgs exposing (..)
 import Commands exposing (getFrameStreams)
-import Models exposing (Model, FrameStream, FramePhoto, GetFrameResponse, FrameIdentification)
+import Models exposing (Model, FrameStream, FramePhoto, GetFrameResponse, FrameIdentification, DisplayPhoto)
 import Update exposing (update)
 
 main : Program Never Model Msg
@@ -24,7 +25,7 @@ main =
 
 init : FrameIdentification -> (Model, Cmd Msg)
 init frameIdentification =
-  ( Model frameIdentification RemoteData.NotAsked []
+  ( Model frameIdentification RemoteData.NotAsked [] Nothing []
   , getFrameStreams frameIdentification
   )
 
@@ -39,8 +40,21 @@ view model =
     , br [] []
     , img [src "to-be-or-not"] []
     , text (toString (List.map (\x -> { s = x.stream.name, p = x.photo.id }) model.photos))
+    , div []
+      [ maybePhoto model.currentPhoto ]
 --    , maybeResponse model.streams
     ]
+
+
+maybePhoto : Maybe DisplayPhoto -> Html Msg
+maybePhoto maybePhoto =
+  case maybePhoto of
+    Nothing ->
+      text "No picture yet..."
+
+    Just photo ->
+      -- URL: '/public/api/frames/' + frameId + '/streams/' + stream.id + '/photos/' + photo.id + '?access_key=' + accessKey,
+      text ("/public/api/frames/" ++ (toString photo.frame) ++ "/streams" ++ (toString photo.stream.id) ++ "/photos/" ++ (toString photo.photo.id) ++ "?access_key=" ++ photo.accessKey)
 
 
 maybeResponse : WebData GetFrameResponse -> Html Msg
@@ -64,4 +78,7 @@ maybeResponse response =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  if List.isEmpty model.photos then
+    Sub.none
+  else
+    Time.every (2 * Time.second) TimerTick

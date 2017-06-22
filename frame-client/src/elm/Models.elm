@@ -6,6 +6,8 @@ type alias Model =
   { frameIdentification : FrameIdentification
   , streams : WebData GetFrameResponse
   , photos : List DisplayPhoto
+  , currentPhoto : Maybe DisplayPhoto
+  , nextPhotos : List DisplayPhoto
   }
 
 
@@ -34,7 +36,7 @@ type alias GetFrameResponse =
 
 -- Represent a photo for display at runtime
 type alias DisplayPhoto =
-  { frame : Int
+  { frame : FrameId
   , stream : FrameStream
   , photo : FramePhoto
   , accessKey : String
