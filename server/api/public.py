@@ -1,5 +1,6 @@
 import webapp2
 import json
+import logging
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -56,17 +57,23 @@ class PublicPhotoApi(webapp2.RequestHandler):
             self.response.write('frame not found')
             return
 
+        logging.info("found frame {0}".format(frame))
+
         if (not stream_key in frame.streams):
             self.response.status = 404
-            self.response.write('frame not found')
+            self.response.write('stream not found in frame')
             return
+
+        logging.info("found stream {0}".format(stream_key))
 
         photo_key = ndb.Key('Photo', int(photo_id), parent=stream_key)
         photo = photo_key.get()
 
         if (photo is None):
             self.response.status = 404
-            self.response.write('picture not found')
+            self.response.write('photo not found')
             return
+
+        logging.info("found photo {0}".format(photo))
 
         read_photo_from_storage(photo, self.response)

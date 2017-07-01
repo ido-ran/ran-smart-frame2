@@ -1,5 +1,6 @@
 import logging
 import os
+import logging
 
 from google.appengine.api import app_identity
 
@@ -23,5 +24,6 @@ def read_photo_from_storage(photo, response):
         gcs_file.close()
 
     except gcs.NotFoundError:
+        logging.exception("Fail to read photo file")
         response.status = 404
-        response.write('photo not found')
+        response.write('photo file not found')
