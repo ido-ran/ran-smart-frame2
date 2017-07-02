@@ -92,7 +92,7 @@ export function loadStream(streamId) {
 
 export function loadStreamPhotos(streamId) {
   return dispatch => {
-    fetch(`/api/streams/${streamId}/photos?include_thumbnail=true`, {
+    fetch(`/api/streams/${streamId}/photos`, {
       credentials: 'include'
     })
     .then(function(response) {

@@ -76,4 +76,4 @@ class PublicPhotoApi(webapp2.RequestHandler):
 
         logging.info("found photo {0}".format(photo))
 
-        read_photo_from_storage(photo, self.response)
+        read_photo_from_storage(photo, 'main', self.response)

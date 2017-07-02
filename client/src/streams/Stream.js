@@ -34,7 +34,7 @@ class Stream extends Component {
         {
           this.props.photos.map(photo => {
             return (
-              <li key={photo.id}><Link to={`/streams/${this.props.params.streamId}/photos/${photo.id}`}><img alt="thumbnail" src={`data:image/png;base64,${photo.thumbnail}`} /></Link></li>
+              <li key={photo.id}><Link to={`/streams/${this.props.params.streamId}/photos/${photo.id}`}><img alt="thumbnail" src={`/api/streams/${this.props.params.streamId}/photos/${photo.id}/thumbnail`} /></Link></li>
             )
           })
         }

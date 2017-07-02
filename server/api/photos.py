@@ -14,7 +14,7 @@ import cloudstorage as gcs
 
 from serializers import default_json_serializer
 from models import Photo
-from photo_storage import read_photo_from_storage
+from photo_storage import read_photo_from_storage, write_photo_to_storage
 
 class PhotosApi(webapp2.RequestHandler):
 
@@ -24,14 +24,8 @@ class PhotosApi(webapp2.RequestHandler):
         photos_query = Photo.query(ancestor=stream_key)
         photos = photos_query.fetch(10)
 
-        include_thumbnail = self.request.get('include_thumbnail')
-
         self.response.headers['Content-Type'] = 'application/json'
-
-        if (include_thumbnail):
-            self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id(), thumbnail=base64.b64encode(g.thumbnail))) for g in photos], default=default_json_serializer))
-        else:
-            self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id(), thumbnail='')) for g in photos], default=default_json_serializer))
+        self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id())) for g in photos], default=default_json_serializer))
 
     def post(self, stream_id):
         stream_key = ndb.Key('Stream', int(stream_id))
@@ -65,24 +59,12 @@ class PhotosApi(webapp2.RequestHandler):
         checksum = crc32_func(uploaded_file_content)
         logging.info("checksum 10:{0} hex:{0:x}".format(checksum))
 
-        bucket_name = os.environ.get('BUCKET_NAME',
-                                     app_identity.get_default_gcs_bucket_name())
-
-        filename = "/{0}/pics/{1:x}.png".format(bucket_name, checksum)
-
-        write_retry_params = gcs.RetryParams(backoff_factor=1.1)
-        gcs_file = gcs.open(filename,
-                            'w',
-                            content_type=uploaded_file_type,
-                            options={'x-goog-meta-crc32c': "{0:x}".format(checksum)},
-                            retry_params=write_retry_params)
-        gcs_file.write(image_content_to_save)
-        gcs_file.close()
+        write_photo_to_storage(users.get_current_user().user_id(), checksum, 'main', uploaded_file_type, image_content_to_save)
+        write_photo_to_storage(users.get_current_user().user_id(), checksum, 'thumbnail', uploaded_file_type, thumbnail)
 
         photo = Photo(
                       parent = stream_key,
                       created_by_user_id=users.get_current_user().user_id(),
-                      thumbnail=thumbnail,
                       crc32c=checksum)
         photo.put()
 
@@ -90,7 +72,7 @@ class PhotosApi(webapp2.RequestHandler):
 
 class PhotoApi(webapp2.RequestHandler):
 
-    def get(self, stream_id, photo_id):
+    def get(self, stream_id, photo_id, photo_label='main'):
         stream_key = ndb.Key('Stream', int(stream_id))
         photo_key = ndb.Key('Photo', int(photo_id), parent=stream_key)
         photo = photo_key.get()
@@ -98,4 +80,4 @@ class PhotoApi(webapp2.RequestHandler):
         bucket_name = os.environ.get('BUCKET_NAME',
                                      app_identity.get_default_gcs_bucket_name())
 
-        read_photo_from_storage(photo, self.response)
+        read_photo_from_storage(photo, photo_label, self.response)
