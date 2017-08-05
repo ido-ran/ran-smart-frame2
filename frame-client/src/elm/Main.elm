@@ -16,7 +16,7 @@ import Update exposing (update)
 main : Program Never Model Msg
 main =
   Html.program
-    { init = init { frameId = "5275456790069248", accessKey = "ZpPOGLVnO7yTEIMIHq0MB9ee6ZWNWnZus2ijvlZG" }
+    { init = init { frameId = "5634472569470976", accessKey = "BtZifleqeqAetokvKS7Nimjp61Vf9doDZgNnkRvJ" }
     , view = view
     , update = update
     , subscriptions = subscriptions
@@ -56,7 +56,7 @@ maybePhoto maybePhoto =
       -- URL: '/public/api/frames/' + frameId + '/streams/' + stream.id + '/photos/' + photo.id + '?access_key=' + accessKey,
       div []
       [ text ("/public/api/frames/" ++ photo.frame ++ "/streams/" ++ (toString photo.stream.id) ++ "/photos/" ++ (toString photo.photo.id) ++ "?access_key=" ++ photo.accessKey)
-        , img [ src ("http://localhost:8080/public/api/frames/" ++ photo.frame ++ "/streams/" ++ (toString photo.stream.id) ++ "/photos/" ++ (toString photo.photo.id) ++ "?access_key=" ++ photo.accessKey)
+        , img [ src ("/public/api/frames/" ++ photo.frame ++ "/streams/" ++ (toString photo.stream.id) ++ "/photos/" ++ (toString photo.photo.id) ++ "?access_key=" ++ photo.accessKey)
                 , height 300
                 , width 300] []
       ]
