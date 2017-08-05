@@ -1,0 +1,45 @@
+
+task deleteServerWWW(type: Delete, dependsOn: ':client:npm_run_build') {
+  delete 'server/www'
+}
+
+task buildClient (type: Copy, dependsOn: deleteServerWWW) {
+  from 'client/build'
+  into 'server/www'
+}
+
+
+
+task deleteServerWWWPublic(type: Delete, dependsOn: ':frame-client:npm_run_build') {
+  delete 'server/www_public'
+}
+
+task buildFrameClient (type: Copy, dependsOn: deleteServerWWWPublic) {
+  from 'frame-client/dist'
+  into 'server/www_public'
+}
+
+task build (dependsOn: [buildFrameClient, buildClient]) {
+  description 'Build the ran-smart-frame2 app'
+  group 'RanSmartFrame'
+}
+
+task deployIndex(type: Exec) {
+  inputs.file 'server/index.yaml'
+  outputs.file 'server/index.yaml'
+  commandLine 'cmd', '/c', 'gcloud', 'app', 'deploy', '--project', appEngineProject, '-v', appEngineVersion, 'server/index.yaml'
+}
+
+task deployProject(type: Exec, dependsOn: deployIndex) {
+  description 'Deploy the project to Google AppEngine'
+  group 'RanSmartFrame'
+
+  inputs.dir 'server'
+  outputs.dir 'server'
+  commandLine 'cmd', '/c', 'gcloud', 'app', 'deploy', '--project', appEngineProject, '-v', appEngineVersion, 'server/app.yaml'
+}
+
+task deploy(dependsOn: [build, deployProject]) {
+  description 'Build & Deploy'
+  group 'RanSmartFrame'
+}

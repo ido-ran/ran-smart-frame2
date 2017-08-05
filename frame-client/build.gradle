@@ -1,0 +1,13 @@
+plugins {
+  id "com.moowork.node" version "1.2.0"
+}
+
+npm_install.inputs.file 'package.json'
+npm_install.outputs.dir 'node_modules'
+
+task npm_run_build(type: NpmTask) {
+  args = ['run', 'build']
+
+  inputs.dir 'src'
+  outputs.dir 'build'
+}

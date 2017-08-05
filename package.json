@@ -3,14 +3,8 @@
   "version": "0.1.0",
   "description": "Digital picture frame platform",
   "main": "index.js",
-  "appEngine": {
-    "project": "ran-frame2",
-    "version": "1"
-  },
   "scripts": {
-    "build": "cd client && npm run build && cd .. && node scripts/build.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "npm run build && node scripts/deploy.js",
     "dev:appengine": "python \"C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin\\dev_appserver.py\" server",
     "dev:webpack": "cd client && npm start",
     "dev:frame-client": "cd frame-client && npm start",

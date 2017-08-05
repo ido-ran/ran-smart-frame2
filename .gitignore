@@ -3,3 +3,5 @@ deploy.cmd
 node_modules/
 www/
 elm-stuff/
+.gradle
+server/www_public
