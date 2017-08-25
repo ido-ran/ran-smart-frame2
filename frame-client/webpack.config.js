@@ -64,7 +64,13 @@ if (isDev === true) {
             // serve index.html in place of 404 responses
             historyApiFallback: true,
             contentBase: './src',
-            hot: true
+            hot: true,
+            proxy: {
+              '/public/api': {
+                target: 'http://localhost:8080',
+                secure: false
+              }
+            }
         },
         module: {
             rules: [{

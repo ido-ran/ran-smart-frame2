@@ -1,6 +1,7 @@
 import logging
 import os
 import logging
+import urllib
 
 from google.appengine.api import app_identity
 
@@ -44,4 +45,4 @@ def write_photo_to_storage(user_id, checksum, label, file_type, image_content):
     gcs_file.close()
 
 def format_photo_file_name(bucket_name, user_id, checksum, label):
-    return "/{0}/pics/{1}/{2:x}_{3}.png".format(bucket_name, user_id, checksum, label)
+    return urllib.quote("/{0}/pics/{1}/{2:x}_{3}.png".format(bucket_name, user_id, checksum, label))
