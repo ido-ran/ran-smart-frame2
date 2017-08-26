@@ -11,6 +11,7 @@ import Stream from './streams/Stream'
 import Photo from './streams/Photo'
 import Frames from './frames/Frames'
 import Frame from './frames/Frame'
+import SelectFrame from './select-frame/SelectFrame'
 import './index.css';
 
 let store = configStore();
@@ -27,6 +28,8 @@ ReactDOM.render(
 
           <Route path="/frames" component={Frames} />
           <Route path="/frames/:frameId" component={Frame} />
+
+          <Route path="/select-frame" component={SelectFrame} />
         </Route>
       </Router>
     </Provider>,

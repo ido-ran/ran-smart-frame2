@@ -13,10 +13,10 @@ import Commands exposing (getFrameStreams)
 import Models exposing (Model, FrameStream, FramePhoto, GetFrameResponse, FrameIdentification, DisplayPhoto)
 import Update exposing (update)
 
-main : Program Never Model Msg
+main : Program FrameIdentification Model Msg
 main =
-  Html.program
-    { init = init { frameId = "5910974510923776", accessKey = "SnC7wevrfRBhIUtPtrLEfJnoGUsAB7lsAR3TojqP" }
+  Html.programWithFlags
+    { init = init
     , view = view
     , update = update
     , subscriptions = subscriptions

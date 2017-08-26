@@ -26,6 +26,16 @@ class App extends Component {
   }
 
   render() {
+    if ('/select-frame' === this.props.location.pathname) {
+      // select-frame is standalone app and should not have the
+      // applciation chrome.
+      return (
+        <div>
+          {this.props.children}
+        </div>
+      );
+    }
+
     return (
       <div>
         <div>Welcome to RanFrame</div>

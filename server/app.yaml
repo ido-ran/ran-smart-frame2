@@ -6,6 +6,12 @@ handlers:
 - url: /public/api/(.*)
   script: frame_public.app
 
+- url: /api/(.*)
+  script: frame_admin.app
+  login: required
+
+############### public ##################
+
 - url: /public
   static_files: www_public/index.html
   upload: www_public/index.html
@@ -13,18 +19,37 @@ handlers:
 - url: /public/(.*)
   static_files: www_public/\1
   upload: www_public/(.*)
-
-- url: /api/(.*)
-  script: frame_admin.app
   login: required
 
-- url: /
-  static_files: www/index.html
-  upload: www/index.html
-  login: required
+################## Admin ######################
 
-- url: /(.*)
+- url: /(.*\.js)
   static_files: www/\1
+  upload: www/(.*\.js)
+  login: required
+
+- url: /(.*\.jpg)
+  static_files: www/\1
+  upload: www/(.*\.jpg)
+  login: required
+
+- url: /(.*\.ico)
+  static_files: www/\1
+  upload: www/(.*\.ico)
+  login: required
+
+- url: /(.*\.css)
+  static_files: www/\1
+  upload: www/(.*\.css)
+  login: required
+
+- url: (.*)/
+  static_files: www/index.html
+  upload: www/(.*)
+  login: required
+
+- url: (.*)
+  static_files: www/index.html
   upload: www/(.*)
   login: required
 
