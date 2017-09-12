@@ -22,7 +22,7 @@ class Frames extends Component {
         <h1>Select a Frame</h1>
         <ul>
         {this.props.frames.items.map(frame => (
-          <li key={`frame${frame.name}`}><a href="#" onClick={() => this.selectFrame(frame.id, frame.access_key)}>{frame.name}</a></li>
+          <li key={`frame${frame.name}`}  className="select-frame-item"><button onClick={() => this.selectFrame(frame.id, frame.access_key)}>{frame.name}</button></li>
         ))}
         </ul>
       </div>)
@@ -33,7 +33,7 @@ class Frames extends Component {
     localStorage.setItem('frameId', frameId);
     localStorage.setItem('accessKey', frameAccessKey);
 
-    location = '/public';
+    location.pathname = '/public';
   }
 
 }

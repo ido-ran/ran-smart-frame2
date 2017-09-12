@@ -7,3 +7,8 @@ body {
 ul {
   list-style-type: none
 }
+
+.select-frame-item > button {
+  margin: 30px;
+  padding: 70px;
+}
