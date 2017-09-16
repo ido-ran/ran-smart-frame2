@@ -66,7 +66,7 @@ if (isDev === true) {
             contentBase: './src',
             hot: true,
             proxy: {
-              '/public/api': {
+              '/frame-client/api': {
                 target: 'http://localhost:8080',
                 secure: false
               }
@@ -97,7 +97,7 @@ if (isProd === true) {
     module.exports = merge(commonConfig, {
         entry: entryPath,
         output: {
-          publicPath: '/public'
+          publicPath: '/frame-client'
         },
         module: {
             rules: [{

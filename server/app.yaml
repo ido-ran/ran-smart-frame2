@@ -12,14 +12,13 @@ handlers:
 
 ############### public ##################
 
-- url: /public
-  static_files: www_public/index.html
-  upload: www_public/index.html
+- url: /frame-client
+  static_files: www_frameclient/index.html
+  upload: www_frameclient/index.html
 
-- url: /public/(.*)
-  static_files: www_public/\1
-  upload: www_public/(.*)
-  login: required
+- url: /frame-client/(.*)
+  static_files: www_frameclient/\1
+  upload: www_frameclient/(.*)
 
 ################## Admin ######################
 

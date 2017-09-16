@@ -9,5 +9,5 @@ task npm_run_build(type: NpmTask) {
   args = ['run', 'build']
 
   inputs.dir 'src'
-  outputs.dir 'build'
+  outputs.dir 'dist'
 }

@@ -10,13 +10,13 @@ task buildClient (type: Copy, dependsOn: deleteServerWWW) {
 
 
 
-task deleteServerWWWPublic(type: Delete, dependsOn: ':frame-client:npm_run_build') {
-  delete 'server/www_public'
+task deleteServerWWWFrameClient(type: Delete, dependsOn: ':frame-client:npm_run_build') {
+  delete 'server/www_frameclient'
 }
 
-task buildFrameClient (type: Copy, dependsOn: deleteServerWWWPublic) {
+task buildFrameClient (type: Copy, dependsOn: deleteServerWWWFrameClient) {
   from 'frame-client/dist'
-  into 'server/www_public'
+  into 'server/www_frameclient'
 }
 
 task build (dependsOn: [buildFrameClient, buildClient]) {

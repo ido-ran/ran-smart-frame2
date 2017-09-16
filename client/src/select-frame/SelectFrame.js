@@ -33,7 +33,7 @@ class Frames extends Component {
     localStorage.setItem('frameId', frameId);
     localStorage.setItem('accessKey', frameAccessKey);
 
-    location.pathname = '/public';
+    location.pathname = '/frame-client';
   }
 
 }

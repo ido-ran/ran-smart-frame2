@@ -4,4 +4,4 @@ node_modules/
 www/
 elm-stuff/
 .gradle
-server/www_public
+server/www_frameclient/
