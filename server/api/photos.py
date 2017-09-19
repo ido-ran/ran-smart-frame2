@@ -1,9 +1,9 @@
 import webapp2
 import json
 import base64
-import crcmod
 import logging
 import os
+import hashlib
 
 from google.appengine.api import app_identity
 from google.appengine.api import users
@@ -54,10 +54,9 @@ class PhotosApi(webapp2.RequestHandler):
 
         thumbnail = images.resize(image_content_to_save, 200, 200)
 
-        # even if we process the file we calc the crc using original upload content.
-        crc32_func = crcmod.predefined.mkCrcFun('crc-32c')
-        checksum = crc32_func(uploaded_file_content)
-        logging.info("checksum 10:{0} hex:{0:x}".format(checksum))
+        # even if we process the file we calc the hash using original upload content.
+        checksum = base64.urlsafe_b64encode(hashlib.sha256(uploaded_file_content).digest())
+        logging.info("sha256: {0}".format(checksum))
 
         write_photo_to_storage(users.get_current_user().user_id(), checksum, 'main', uploaded_file_type, image_content_to_save)
         write_photo_to_storage(users.get_current_user().user_id(), checksum, 'thumbnail', uploaded_file_type, thumbnail)
@@ -65,7 +64,7 @@ class PhotosApi(webapp2.RequestHandler):
         photo = Photo(
                       parent = stream_key,
                       created_by_user_id=users.get_current_user().user_id(),
-                      crc32c=checksum)
+                      sha256=checksum)
         photo.put()
 
         self.response.out.write("ok")

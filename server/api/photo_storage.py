@@ -13,7 +13,7 @@ def read_photo_from_storage(photo, label, response):
     bucket_name = os.environ.get('BUCKET_NAME',
                                  app_identity.get_default_gcs_bucket_name())
 
-    filename = format_photo_file_name(bucket_name, photo.created_by_user_id, photo.crc32c, label)
+    filename = format_photo_file_name(bucket_name, photo.created_by_user_id, photo.sha256, label)
 
     try:
         file_stat = gcs.stat(filename)
@@ -39,10 +39,10 @@ def write_photo_to_storage(user_id, checksum, label, file_type, image_content):
     gcs_file = gcs.open(filename,
                         'w',
                         content_type=file_type,
-                        options={'x-goog-meta-crc32c': "{0:x}".format(checksum)},
+                        options={'x-goog-meta-sha256': checksum },
                         retry_params=write_retry_params)
     gcs_file.write(image_content)
     gcs_file.close()
 
 def format_photo_file_name(bucket_name, user_id, checksum, label):
-    return urllib.quote("/{0}/pics/{1}/{2:x}_{3}.png".format(bucket_name, user_id, checksum, label))
+    return urllib.quote("/{0}/pics/{1}/{2}_{3}.png".format(bucket_name, user_id, checksum, label))

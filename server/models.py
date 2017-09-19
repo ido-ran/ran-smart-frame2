@@ -16,8 +16,7 @@ class Photo(ndb.Model):
     name = ndb.StringProperty(indexed=False)
     created_by_user_id = ndb.StringProperty(indexed=True)
     created_at = ndb.DateTimeProperty(auto_now_add=True)
-    storage_path = ndb.StringProperty(indexed=False)
-    crc32c = ndb.IntegerProperty(indexed=False)
+    sha256 = ndb.StringProperty(indexed=False)
 
     def serialize(self):
         return {
