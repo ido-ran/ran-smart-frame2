@@ -10,7 +10,12 @@ class Stream extends Component {
 
   constructor() {
     super()
-    this.state = {newStreamName: ''}
+    this.state = {
+      newStreamName: '',
+      uploading: false,
+      file: null,
+      imagePreviewUrl: null
+    }
 
     this._loadStreamPhotos = this._loadStreamPhotos.bind(this)
   }
@@ -24,11 +29,59 @@ class Stream extends Component {
     this.props.loadStreamPhotos(this.props.params.streamId)
   }
 
+  handleFileSelected(file) {
+    let reader = new FileReader();
+
+    reader.onloadend = () => {
+      this.setState({
+        file: file,
+        imagePreviewUrl: reader.result
+      });
+    }
+
+    reader.readAsDataURL(file)
+  }
+
+  handleUpload() {
+    const { file } = this.state;
+    
+    this.setState({ uploading: true })
+    var form = new FormData();
+    form.append('image', file, 'filename.txt');
+
+    fetch(`/api/streams/${this.props.params.streamId}/photos`, {
+      method: "POST",
+      body: form,
+      credentials: 'include'
+    }).then(() => {
+      setTimeout(this._loadStreamPhotos, 500)
+      this.setState({
+        uploading: false,
+        imagePreviewUrl: null,
+        file: null
+      })
+    });
+
+    this.setState({newStreamName: ''})
+  }
+
+  uploadingElementRender() {
+    const { uploading } = this.state;
+    if (!uploading) return null;
+
+    return <div>Uploading...</div>;
+  }
+
   render() {
     return (
       <div>
         <h1>{this.props.stream.name}</h1>
-        <ImageUplaod onUpload={(file) => this.handleUpload(file)} />
+        <ImageUplaod
+          onUpload={(file) => this.handleUpload(file)}
+          onFileSelected={(file) => this.handleFileSelected(file)}
+          imagePreviewUrl={this.state.imagePreviewUrl} />
+
+        { this.uploadingElementRender() }
 
         <ul>
         {
@@ -40,22 +93,6 @@ class Stream extends Component {
         }
         </ul>
       </div>)
-  }
-
-
-  handleUpload(file) {
-    var form = new FormData();
-    form.append("image", file, "filename.txt");
-
-    fetch(`/api/streams/${this.props.params.streamId}/photos`, {
-      method: "POST",
-      body: form,
-      credentials: 'include'
-    }).then(() => {
-      setTimeout(this._loadStreamPhotos, 500)
-    });
-
-    this.setState({newStreamName: ''})
   }
 
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import './ImageUpload.css';
 
 export default class ImageUpload extends React.Component {
   constructor(props) {
@@ -8,30 +9,22 @@ export default class ImageUpload extends React.Component {
 
   _handleSubmit(e) {
     e.preventDefault();
-    this.props.onUpload(this.state.file)
+    this.props.onUpload()
   }
 
   _handleImageChange(e) {
     e.preventDefault();
 
-    let reader = new FileReader();
-    let file = e.target.files[0];
-
-    reader.onloadend = () => {
-      this.setState({
-        file: file,
-        imagePreviewUrl: reader.result
-      });
-    }
-
-    reader.readAsDataURL(file)
+    const file = e.target.files[0]
+    this.props.onFileSelected(file)
   }
 
   render() {
-    const {imagePreviewUrl} = this.state;
+    const {imagePreviewUrl} = this.props;
+
     let $imagePreview = null;
     if (imagePreviewUrl) {
-      $imagePreview = (<img alt="preview" src={imagePreviewUrl} />);
+      $imagePreview = (<img alt="preview" src={imagePreviewUrl} className="preview-image" />);
     } else {
       $imagePreview = (<div className="previewText">Please select an Image for Preview</div>);
     }
