@@ -5,7 +5,7 @@ plugins {
 npm_install.inputs.file 'package.json'
 npm_install.outputs.dir 'node_modules'
 
-task npm_run_build(type: NpmTask) {
+task npm_run_build(type: NpmTask, dependsOn: npm_install) {
   args = ['run', 'build']
 
   inputs.dir 'src'
