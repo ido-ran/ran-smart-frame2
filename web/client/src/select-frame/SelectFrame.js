@@ -1,3 +1,5 @@
+/*global AndroidApp*/
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
@@ -22,18 +24,30 @@ class Frames extends Component {
         <h1>Select a Frame</h1>
         <ul>
         {this.props.frames.items.map(frame => (
-          <li key={`frame${frame.name}`}  className="select-frame-item"><button onClick={() => this.selectFrame(frame.id, frame.access_key)}>{frame.name}</button></li>
+          <li key={`frame${frame.name}`}  className="select-frame-item"><button onClick={() => this.selectFrame(frame)}>{frame.name}</button></li>
         ))}
         </ul>
       </div>)
 
   }
 
-  selectFrame(frameId, frameAccessKey) {
-    localStorage.setItem('frameId', frameId);
-    localStorage.setItem('accessKey', frameAccessKey);
+  selectFrame(frame) {
+    const { name, id, access_key } = frame;
 
-    location.pathname = '/frame-client';
+    if (typeof AndroidApp !== 'undefined') {
+
+      // We run inside Android WebView with AndroidApp refere to object
+      // injected by the Android application.
+      AndroidApp.selectFrame(name, id.toString(), access_key)
+
+    } else {
+
+      localStorage.setItem('frameId', id);
+      localStorage.setItem('accessKey', access_key);
+
+      location.pathname = '/frame-client';
+
+    }
   }
 
 }
