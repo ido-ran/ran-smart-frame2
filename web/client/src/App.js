@@ -3,8 +3,9 @@ import { MuiThemeProvider, createMuiTheme, withStyles } from 'material-ui/styles
 import purple from 'material-ui/colors/purple';
 import green from 'material-ui/colors/green';
 import red from 'material-ui/colors/red';
-import { AppBar, Toolbar, Typography, Button, IconButton  } from 'material-ui'
-import MenuIcon from 'material-ui-icons/Menu';
+import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, Divider  } from 'material-ui'
+import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import { Menu, Home, CameraRoll, CropOriginal } from 'material-ui-icons';
 
 import { Link  } from 'react-router'
 import './App.css';
@@ -17,6 +18,7 @@ class App extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.toggleDrawer = this.toggleDrawer.bind(this);
   }
 
   componentWillMount() {
@@ -31,6 +33,14 @@ class App extends Component {
 
     this.setState({content: ''})
   }
+
+  toggleDrawer(open) {
+    return () => {
+      this.setState({
+        'drawer': open,
+      });
+    };
+};
 
   render() {
     if ('/select-frame' === this.props.location.pathname) {
@@ -60,8 +70,8 @@ class App extends Component {
       <div>
         <AppBar position="static">
           <Toolbar>
-            <IconButton className={classes.menuButton} color="contrast" aria-label="Menu">
-              <MenuIcon />
+            <IconButton onClick={this.toggleDrawer(true)} className={classes.menuButton} color="contrast" aria-label="Menu">
+              <Menu />
             </IconButton>
             <Typography type="title" color="inherit" className={classes.flex}>
               OomkiK
@@ -69,14 +79,43 @@ class App extends Component {
             <Button color="contrast">Logout</Button>
           </Toolbar>
         </AppBar>
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/streams">Streams</Link></li>
-          <li><Link to="/frames">Frames</Link></li>
-        </ul>
-        <MuiThemeProvider theme={theme}>
+        <Drawer open={this.state.drawer} onRequestClose={this.toggleDrawer(false)}>
+          <div
+            tabIndex={0}
+            role="button"
+            onClick={this.toggleDrawer(false)}
+            onKeyDown={this.toggleDrawer(false)}
+          >
+          <div className={classes.list}>
+            <List>
+              <ListItem>
+                <Typography type="title" color="inherit" className={classes.flex}>
+                  OomkiK
+                </Typography>
+              </ListItem>
+              <ListItem button component={Link} to='/'>
+                <ListItemIcon>
+                  <Home />
+                </ListItemIcon>
+                <ListItemText primary="Home" />
+              </ListItem>
+              <ListItem button component={Link} to='/streams'>
+                <ListItemIcon>
+                  <CameraRoll />
+                </ListItemIcon>
+                <ListItemText primary="Streams" />
+              </ListItem>
+              <ListItem button component={Link} to='/frames'>
+                <ListItemIcon>
+                  <CropOriginal />
+                </ListItemIcon>
+                <ListItemText primary="Frames" />
+              </ListItem>
+            </List>
+            </div>
+          </div>
+        </Drawer>
           {this.props.children}
-        </MuiThemeProvider>
       </div>
     );
   }
@@ -93,6 +132,12 @@ const styles = theme => ({
   menuButton: {
     marginLeft: -12,
     marginRight: 20,
+  },
+  list: {
+   width: 250,
+  },
+  listFull: {
+   width: 'auto',
   },
 });
 
