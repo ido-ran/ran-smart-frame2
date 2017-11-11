@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import { MuiThemeProvider, createMuiTheme, withStyles } from 'material-ui/styles';
-import purple from 'material-ui/colors/purple';
-import green from 'material-ui/colors/green';
-import red from 'material-ui/colors/red';
-import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, Divider  } from 'material-ui'
+import { withStyles } from 'material-ui/styles';
+import { AppBar, Toolbar, Typography, Button, IconButton, Drawer  } from 'material-ui'
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import { Menu, Home, CameraRoll, CropOriginal } from 'material-ui-icons';
 
@@ -52,17 +49,6 @@ class App extends Component {
         </div>
       );
     }
-
-    const theme = createMuiTheme({
-      palette: {
-        primary: purple, // Purple and green play nicely together.
-        secondary: {
-          ...green,
-          A400: '#00e677',
-        },
-        error: red,
-      },
-    });
 
     const { classes } = this.props;
 
