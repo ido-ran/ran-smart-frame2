@@ -2,8 +2,21 @@ import React, { Component } from 'react';
 import { Link  } from 'react-router'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
+import TextField from 'material-ui/TextField'
+import Button from 'material-ui/Button'
+import List, { ListItem, ListItemText } from 'material-ui/List';
+import Avatar from 'material-ui/Avatar';
+import { withStyles } from 'material-ui/styles';
+import { CameraRoll } from 'material-ui-icons';
 
 import { loadStreams } from './actions'
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    margin: 30,
+  },
+});
 
 class Streams extends Component {
 
@@ -20,21 +33,29 @@ class Streams extends Component {
   }
 
   render() {
+    const { classes } = this.props;
+
     return (
-      <div>
+      <div className={classes.root}>
         <h1>Stream</h1>
-        <ul>
-        {this.props.streams.items.map(stream => (
-          <li key={`stream${stream.name}`}><Link to={`/streams/${stream.id}`}>{stream.name}</Link></li>
-        ))}
-        </ul>
+        <List>
+          {this.props.streams.items.map(stream => (
+            <ListItem button key={`stream${stream.name}`}
+                      component={Link} to={`/streams/${stream.id}`}>
+              <Avatar>
+                <CameraRoll />
+              </Avatar>
+              <ListItemText primary={stream.name} />
+            </ListItem>
+          ))}
+        </List>
 
         <form onSubmit={this.handleSubmit}>
-          <div>Create New Stream</div>
-          <input type="text" value={this.state.newStreamName} onChange={this.handleChange} />
-          <input type="submit" value="Submit" />
+          <TextField label="Create New Stream" value={this.state.newStreamName} onChange={this.handleChange} />
+          <Button raised color="primary" type="submit">Add</Button>
         </form>
-      </div>)
+      </div>
+    );
   }
 
 
@@ -72,7 +93,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(
+export default withStyles(styles)(connect(
   mapStateToProps,
   mapDispatchToProps
-)(Streams)
+)(Streams))
