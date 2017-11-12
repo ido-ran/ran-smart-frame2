@@ -5,6 +5,7 @@ export const STREAMS_LOAD_FAIL = 'STREAMS_LOAD_FAIL'
 export const STREAM_LOAD_SUCCESS = 'STREAM_LOAD_SUCCESS'
 export const STREAM_LOAD_FAIL = 'STREAM_LOAD_FAIL'
 
+export const STREAM_PHOTOS_LOADING = 'STREAM_PHOTOS_LOADING'
 export const STREAM_PHOTOS_LOAD_SUCCESS = 'STREAM_PHOTOS_LOAD_SUCCESS'
 export const STREAM_PHOTOS_LOAD_FAIL = 'STREAM_PHOTOS_LOAD_FAIL'
 
@@ -56,6 +57,12 @@ function streamLoadFail(streamId, error) {
   }
 }
 
+function streamPhotosLoading(photos) {
+  return {
+    type: STREAM_PHOTOS_LOADING
+  }
+}
+
 function streamPhotosLoadSuccess(photos) {
   return {
     type: STREAM_PHOTOS_LOAD_SUCCESS,
@@ -92,6 +99,8 @@ export function loadStream(streamId) {
 
 export function loadStreamPhotos(streamId) {
   return dispatch => {
+    dispatch(streamPhotosLoading())
+
     fetch(`/api/streams/${streamId}/photos`, {
       credentials: 'include'
     })

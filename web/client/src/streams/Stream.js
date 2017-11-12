@@ -3,8 +3,22 @@ import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 import { Link  } from 'react-router'
 
+import { withStyles } from 'material-ui/styles';
+import { GridList, GridListTile } from 'material-ui/GridList';
+import Subheader from 'material-ui/List/ListSubheader';
+
 import { loadStream, loadStreamPhotos } from './actions'
 import ImageUplaod from './ImageUpload'
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    margin: 30,
+  },
+  gridList: {
+    width: 1050,
+  }
+});
 
 class Stream extends Component {
 
@@ -44,7 +58,7 @@ class Stream extends Component {
 
   handleUpload() {
     const { file } = this.state;
-    
+
     this.setState({ uploading: true })
     var form = new FormData();
     form.append('image', file, 'filename.txt');
@@ -73,8 +87,10 @@ class Stream extends Component {
   }
 
   render() {
+    const { classes, photos, photosLoaded } = this.props;
+
     return (
-      <div>
+      <div className={classes.root}>
         <h1>{this.props.stream.name}</h1>
         <ImageUplaod
           onUpload={(file) => this.handleUpload(file)}
@@ -83,15 +99,18 @@ class Stream extends Component {
 
         { this.uploadingElementRender() }
 
-        <ul>
-        {
-          this.props.photos.map(photo => {
-            return (
-              <li key={photo.id}><Link to={`/streams/${this.props.params.streamId}/photos/${photo.id}`}><img alt="thumbnail" src={`/api/streams/${this.props.params.streamId}/photos/${photo.id}/thumbnail`} /></Link></li>
-            )
-          })
-        }
-        </ul>
+        <GridList cellHeight={160} className={classes.gridList} cols={5}>
+          <GridListTile key="Subheader" cols={5} style={{ height: 'auto' }}>
+            <Subheader>{photosLoaded ? `${photos.length} Photos` : 'Loading...'}</Subheader>
+          </GridListTile>
+          {photos.map(photo => (
+            <GridListTile key={photo.id}>
+              <Link to={`/streams/${this.props.params.streamId}/photos/${photo.id}`}>
+                <img alt="thumbnail" src={`/api/streams/${this.props.params.streamId}/photos/${photo.id}/thumbnail`} />
+              </Link>
+            </GridListTile>
+          ))}
+        </GridList>
       </div>)
   }
 
@@ -104,12 +123,13 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state) {
     return {
         stream: state.stream.item,
-        isLoaded: state.stream.isLoaded,
-        photos: state.stream.photos
+        loaded: state.stream.loaded,
+        photos: state.stream.photos,
+        photosLoaded: state.stream.photosLoaded
     };
 }
 
-export default connect(
+export default withStyles(styles)(connect(
   mapStateToProps,
   mapDispatchToProps
-)(Stream)
+)(Stream))
