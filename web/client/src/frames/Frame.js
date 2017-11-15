@@ -2,8 +2,21 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 
+import List, { ListItem, ListItemSecondaryAction, ListItemText } from 'material-ui/List';
+import Checkbox from 'material-ui/Checkbox';
+import { withStyles } from 'material-ui/styles';
+import Avatar from 'material-ui/Avatar';
+import { CameraRoll } from 'material-ui-icons';
+
 import { loadFrame, linkStreamToFrame, unlinkStreamToFrame } from './actions'
 import { loadStreams } from '../streams/actions'
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    margin: 30,
+  },
+});
 
 class Frame extends Component {
 
@@ -12,25 +25,51 @@ class Frame extends Component {
     this.props.loadStreams()
   }
 
+  handleToggle = stream => () => {
+    const isSelected = this.props.frame.streams.find(selectedStream =>
+      selectedStream.id === stream.id);
+
+    if (isSelected) {
+      this.unlinkStream(stream)
+    } else {
+      this.linkStream(stream)
+    }
+  };
+
+
   render() {
+    const { classes } = this.props;
+
     if (!this.props.loaded) return null;
+
+    const selectedStreamIds = this.props.frame.streams.map(stream => stream.id);
     return (
-      <div>
+      <div className={classes.root}>
         <h1>{this.props.frame.frame.name}</h1>
 
         <h2>Streams</h2>
-        <ul>
-          {this.props.frame.streams.map(stream => (
-            <li key={`stream_${stream.id}`}><button onClick={() => this.unlinkStream(stream)}>{stream.name}</button></li>
-          ))}
-        </ul>
 
-        <h2>Add stream</h2>
-        <ul>
+        <List>
           {this.props.streams.map(stream => (
-            <li key={`link_stream_${stream.id}`}><button onClick={() => this.linkStream(stream)}>{stream.name}</button></li>
+            <ListItem
+              key={stream.id}
+              dense
+              button
+              onClick={this.handleToggle(stream)}
+              className={classes.listItem}
+            >
+              <Avatar>
+                <CameraRoll />
+              </Avatar>
+              <Checkbox
+                checked={selectedStreamIds.indexOf(stream.id) !== -1}
+                tabIndex={-1}
+                disableRipple
+              />
+              <ListItemText primary={`${stream.name}`} />
+            </ListItem>
           ))}
-        </ul>
+        </List>
       </div>)
   }
 
@@ -48,7 +87,8 @@ function mapDispatchToProps(dispatch) {
       loadFrame,
       loadStreams,
       linkStreamToFrame,
-      unlinkStreamToFrame }, dispatch);
+      unlinkStreamToFrame,
+    }, dispatch);
 }
 
 function mapStateToProps(state) {
@@ -59,7 +99,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(
+export default withStyles(styles)(connect(
   mapStateToProps,
   mapDispatchToProps
-)(Frame)
+)(Frame))
