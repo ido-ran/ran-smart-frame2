@@ -3,7 +3,21 @@ import { Link  } from 'react-router'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 
+import TextField from 'material-ui/TextField'
+import Button from 'material-ui/Button'
+import List, { ListItem, ListItemText } from 'material-ui/List';
+import Avatar from 'material-ui/Avatar';
+import { withStyles } from 'material-ui/styles';
+import { CropOriginal } from 'material-ui-icons';
+
 import { loadFrames } from './actions'
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    margin: 30,
+  },
+});
 
 class Frames extends Component {
 
@@ -20,19 +34,26 @@ class Frames extends Component {
   }
 
   render() {
+    const { classes, frames } = this.props;
+
     return (
-      <div>
+      <div className={classes.root}>
         <h1>Frames</h1>
-        <ul>
-        {this.props.frames.items.map(frame => (
-          <li key={`frame${frame.name}`}><Link to={`/frames/${frame.id}`}>{frame.name}</Link></li>
-        ))}
-        </ul>
+        <List>
+          {frames.items.map(frame => (
+            <ListItem button key={`stream${frame.name}`}
+                      component={Link} to={`/frames/${frame.id}`}>
+              <Avatar>
+                <CropOriginal />
+              </Avatar>
+              <ListItemText primary={frame.name} />
+            </ListItem>
+          ))}
+        </List>
 
         <form onSubmit={this.handleSubmit}>
-          <div>Create New Frame</div>
-          <input type="text" value={this.state.newFrameName} onChange={this.handleChange} />
-          <input type="submit" value="Submit" />
+          <TextField label="Create New Frame" value={this.state.newFrameName} onChange={this.handleChange} />
+          <Button raised color="primary" type="submit">Add</Button>
         </form>
       </div>)
   }
@@ -72,7 +93,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(
+export default withStyles(styles)(connect(
   mapStateToProps,
   mapDispatchToProps
-)(Frames)
+)(Frames))
