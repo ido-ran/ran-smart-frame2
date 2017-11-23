@@ -208,7 +208,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private void fetchFrameData() {
 
-        FrameInfo selectedFrame = loadSelectedFrame();
+        final FrameInfo selectedFrame = loadSelectedFrame();
         if (selectedFrame == null) {
             debug("No frame is selected yet");
             return;
@@ -219,14 +219,14 @@ public class FullscreenActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = MessageFormat.format(
-                "https://ran-frame2.appspot.com/public/api/frames/{0}?access_key={1}",
+                "https://oomkik.com/public/api/frames/{0}?access_key={1}",
                 selectedFrame.id, selectedFrame.accessKey);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 debug("Data loaded");
-                parseResponse(response);
+                parseResponse(response, selectedFrame);
             }
         },
                 new Response.ErrorListener() {
@@ -247,7 +247,7 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
-    private void parseResponse(JSONObject response) {
+    private void parseResponse(JSONObject response, FrameInfo selectedFrame) {
         try {
             JSONArray streams = response.getJSONArray("streams");
             for (int streamIndex = 0; streamIndex < streams.length(); streamIndex++) {
@@ -258,8 +258,13 @@ public class FullscreenActivity extends AppCompatActivity {
                 for (int photoIndex = 0; photoIndex < photos.length(); photoIndex++) {
                     JSONObject photo = photos.getJSONObject(photoIndex);
                     String photoId = photo.getString("id");
+                    
+                    String url =
+                            MessageFormat.format(
+                                    "https://oomkik.com/public/api/" +
+                                            "frames/{0}/streams/{1}/photos/{2}?access_key={3}",
+                                    selectedFrame.id, streamId, photoId, selectedFrame.accessKey);
 
-                    String url = MessageFormat.format("https://ran-frame2.appspot.com/public/api/frames/5634472569470976/streams/{0}/photos/{1}?access_key=BtZifleqeqAetokvKS7Nimjp61Vf9doDZgNnkRvJ", streamId, photoId);
                     mPhotoUrls.add(url);
                 }
 
