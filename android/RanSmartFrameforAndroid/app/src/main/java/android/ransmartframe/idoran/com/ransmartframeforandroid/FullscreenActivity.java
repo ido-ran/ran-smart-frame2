@@ -219,7 +219,7 @@ public class FullscreenActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = MessageFormat.format(
-                "https://oomkik.com/public/api/frames/{0}?access_key={1}",
+                Apis.API_ROOT_URL + "/public/api/frames/{0}?access_key={1}",
                 selectedFrame.id, selectedFrame.accessKey);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -258,10 +258,10 @@ public class FullscreenActivity extends AppCompatActivity {
                 for (int photoIndex = 0; photoIndex < photos.length(); photoIndex++) {
                     JSONObject photo = photos.getJSONObject(photoIndex);
                     String photoId = photo.getString("id");
-                    
+
                     String url =
                             MessageFormat.format(
-                                    "https://oomkik.com/public/api/" +
+                                    Apis.API_ROOT_URL + "/public/api/" +
                                             "frames/{0}/streams/{1}/photos/{2}?access_key={3}",
                                     selectedFrame.id, streamId, photoId, selectedFrame.accessKey);
 

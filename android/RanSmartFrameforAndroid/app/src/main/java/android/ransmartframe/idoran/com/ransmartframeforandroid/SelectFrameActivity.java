@@ -27,7 +27,7 @@ public class SelectFrameActivity extends AppCompatActivity {
         // Clear cookies to clear any previous login cookies
         CookieManager.getInstance().removeAllCookie();
 
-        mWebView.loadUrl("https://ran-frame2.appspot.com/select-frame");
+        mWebView.loadUrl(Apis.API_ROOT_URL + "/select-frame");
     }
 
     public class JSWebInterface {
