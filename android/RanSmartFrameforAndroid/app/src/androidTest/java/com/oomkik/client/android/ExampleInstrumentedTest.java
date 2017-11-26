@@ -1,4 +1,4 @@
-package android.ransmartframe.idoran.com.ransmartframeforandroid;
+package com.oomkik.client.android;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
