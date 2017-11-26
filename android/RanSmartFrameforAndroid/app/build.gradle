@@ -9,7 +9,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "android.ransmartframe.idoran.com.ransmartframeforandroid"
+        applicationId "com.oomkik.client.android"
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
