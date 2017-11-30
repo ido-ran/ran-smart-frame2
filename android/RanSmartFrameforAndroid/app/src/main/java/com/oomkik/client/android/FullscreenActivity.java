@@ -181,15 +181,19 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void saveSelectedFrame(String frameName, String id, String accessKey) {
-        getPreferences(MODE_PRIVATE).edit()
+        getPreferences().edit()
                 .putString("frameName", frameName)
                 .putString("frameId", id)
                 .putString("frameAccessKey", accessKey)
                 .apply();
     }
 
+    private SharedPreferences getPreferences() {
+        return getPreferences(MODE_PRIVATE);
+    }
+
     private FrameInfo loadSelectedFrame() {
-        SharedPreferences pref = getPreferences(MODE_PRIVATE);
+        SharedPreferences pref = getPreferences();
         FrameInfo selectedFrame = new FrameInfo();
         selectedFrame.name = pref.getString("frameName", null);
         selectedFrame.id = pref.getString("frameId", null);
@@ -219,7 +223,7 @@ public class FullscreenActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = MessageFormat.format(
-                Apis.API_ROOT_URL + "/public/api/frames/{0}?access_key={1}",
+                Apis.API_ROOT_URL + "/public/api1/frames/{0}?access_key={1}",
                 selectedFrame.id, selectedFrame.accessKey);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -227,6 +231,7 @@ public class FullscreenActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 debug("Data loaded");
                 parseResponse(response, selectedFrame);
+                saveFrameData(response.toString());
             }
         },
                 new Response.ErrorListener() {
@@ -234,11 +239,32 @@ public class FullscreenActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         debug("Data load failed");
                         Log.e("FullScreenActivity", "Fail to fetch frame data. " + error.getMessage());
+
+                        String cachedFrameData = getFrameData();
+                        if (cachedFrameData == null) return;
+
+                        try {
+                            JSONObject cachedFrameDataJson = new JSONObject(cachedFrameData);
+                            parseResponse(cachedFrameDataJson, selectedFrame);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            debug("Cached frame data is not JSON parsable");
+                        }
                     }
                 });
 
         // Add the request to the RequestQueue.
         queue.add(request);
+    }
+
+    private void saveFrameData(String frameData) {
+        getPreferences().edit()
+                .putString("frameData", frameData)
+                .apply();
+    }
+
+    public String getFrameData() {
+        return getPreferences().getString("frameData", null);
     }
 
     private void debug(String message) {

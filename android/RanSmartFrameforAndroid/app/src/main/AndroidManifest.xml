@@ -4,6 +4,12 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!--
+    The app uses the permission to be notified when the device finish booting
+    to run the app.
+    -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,6 +31,16 @@
         <activity android:name="com.oomkik.client.android.SelectFrameActivity">
 
         </activity>
+
+        <!--
+        Wire BOOT_COMPLETED even to BootReceiver which runs the app.
+        -->
+        <receiver android:name=".BootReceiver">
+            <intent-filter >
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
