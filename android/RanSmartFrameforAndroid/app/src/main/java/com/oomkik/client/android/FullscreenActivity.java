@@ -223,7 +223,7 @@ public class FullscreenActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = MessageFormat.format(
-                Apis.API_ROOT_URL + "/public/api1/frames/{0}?access_key={1}",
+                Apis.API_ROOT_URL + "/public/api/frames/{0}?access_key={1}",
                 selectedFrame.id, selectedFrame.accessKey);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
