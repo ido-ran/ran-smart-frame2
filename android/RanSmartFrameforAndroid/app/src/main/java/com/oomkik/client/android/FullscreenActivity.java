@@ -1,10 +1,16 @@
 package com.oomkik.client.android;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,7 +35,9 @@ import org.json.JSONObject;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -131,6 +139,16 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     };
 
+    private BroadcastReceiver mHandleQuickBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            System.out.println("shutting down FullscreenActivity...");
+
+            // Quit the app
+            finish();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,6 +187,30 @@ public class FullscreenActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+        LocalBroadcastManager mgr = LocalBroadcastManager.getInstance(this);
+        mgr.registerReceiver(mHandleQuickBroadcast, new IntentFilter("quit-please"));
+
+        scheduleShutdownTimer();
+    }
+
+    private void scheduleShutdownTimer() {
+        // Set the alarm to start at 22:00 PM which will quit the app to allow it to auto-update
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 22);
+        calendar.set(Calendar.MINUTE, 00);
+        calendar.set(Calendar.SECOND, 00);
+        long a = calendar.getTimeInMillis();
+        long b = System.currentTimeMillis();
+
+        AlarmManager alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(this, ShutdownReceiver.class);
+        intent.setAction(ShutdownReceiver.ACTION_SHUTDOWN);
+        PendingIntent pi = PendingIntent.getBroadcast(this, 0, intent, 0);
+        alarmMgr.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                //System.currentTimeMillis() + 2 * 1000
+                pi);
     }
 
     @Override

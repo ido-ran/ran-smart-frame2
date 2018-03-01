@@ -41,6 +41,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".ShutdownReceiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.oomkik.client.android.ShutdownReceiver.ACTION_SHUTDOWN" >
+                </action>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
