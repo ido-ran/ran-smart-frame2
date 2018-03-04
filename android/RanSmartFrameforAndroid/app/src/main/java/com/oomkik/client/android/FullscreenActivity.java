@@ -37,7 +37,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -69,9 +69,20 @@ public class FullscreenActivity extends AppCompatActivity {
     private Handler mHandler = new Handler();
     private int mPhotoIndex = -1;
 
+    /**
+     * Start as false and set to true once the activity has been destroyed.
+     * This is checked by mShowNextPhoto for e.g. to stop delayed operations.
+     */
+    private boolean mActivityDestroyed;
+
     private final Runnable mShowNextPhoto = new Runnable() {
         @Override
         public void run() {
+            if (mActivityDestroyed) {
+                // The activity has been destroyed, ignore this delayed run.
+                return;
+            }
+
             mPhotoIndex++;
 
             if (mPhotoIndex + 1 > mPhotoUrls.size()) {
@@ -84,7 +95,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     .fitCenter()
                     .into(mContentView);
 
-            mHandler.postDelayed(mShowNextPhoto, 20000);
+            mHandler.postDelayed(mShowNextPhoto, 200);
         }
     };
 
@@ -150,6 +161,12 @@ public class FullscreenActivity extends AppCompatActivity {
     };
 
     @Override
+    protected void onDestroy() {
+        mActivityDestroyed = true;
+        super.onDestroy();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -195,20 +212,27 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private void scheduleShutdownTimer() {
         // Set the alarm to start at 22:00 PM which will quit the app to allow it to auto-update
+        long currentTimeInMs = System.currentTimeMillis();
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeInMillis(currentTimeInMs);
         calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 00);
-        calendar.set(Calendar.SECOND, 00);
-        long a = calendar.getTimeInMillis();
-        long b = System.currentTimeMillis();
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        long alarmTimeInMs = calendar.getTimeInMillis();
+
+        if (alarmTimeInMs < currentTimeInMs) {
+            // The alarm time of the day has passed, add another day to wait until that time tomorrow.
+            alarmTimeInMs += TimeUnit.DAYS.toMillis(1);
+        }
 
         AlarmManager alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(this, ShutdownReceiver.class);
         intent.setAction(ShutdownReceiver.ACTION_SHUTDOWN);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, intent, 0);
-        alarmMgr.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+
+        alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmTimeInMs,
                 //System.currentTimeMillis() + 2 * 1000
                 pi);
     }
