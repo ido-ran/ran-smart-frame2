@@ -95,7 +95,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     .fitCenter()
                     .into(mContentView);
 
-            mHandler.postDelayed(mShowNextPhoto, 200);
+            mHandler.postDelayed(mShowNextPhoto, 20000);
         }
     };
 
