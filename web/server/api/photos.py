@@ -22,7 +22,7 @@ class PhotosApi(webapp2.RequestHandler):
         stream_key = ndb.Key('Stream', int(stream_id))
 
         photos_query = Photo.query(ancestor=stream_key)
-        photos = photos_query.fetch(10)
+        photos = photos_query.fetch(1000)
 
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id())) for g in photos], default=default_json_serializer))

@@ -33,7 +33,7 @@ class PublicApi(webapp2.RequestHandler):
     @staticmethod
     def fetch_photos(stream_key):
         photos_query = Photo.query(ancestor=stream_key)
-        photos = photos_query.fetch(10)
+        photos = photos_query.fetch(1000)
 
         return [g.serialize() for g in photos]
 
