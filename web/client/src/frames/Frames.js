@@ -3,12 +3,12 @@ import { Link  } from 'react-router'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 
-import TextField from 'material-ui/TextField'
-import Button from 'material-ui/Button'
-import List, { ListItem, ListItemText } from 'material-ui/List';
-import Avatar from 'material-ui/Avatar';
-import { withStyles } from 'material-ui/styles';
-import { CropOriginal } from 'material-ui-icons';
+import TextField from '@material-ui/core/TextField'
+import Button from '@material-ui/core/Button'
+import { List, ListItem, ListItemText } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
+import { withStyles } from '@material-ui/core/styles';
+import { CropOriginal } from '@material-ui/icons';
 
 import { loadFrames } from './actions'
 
@@ -53,7 +53,7 @@ class Frames extends Component {
 
         <form onSubmit={this.handleSubmit}>
           <TextField label="Create New Frame" value={this.state.newFrameName} onChange={this.handleChange} />
-          <Button raised color="primary" type="submit">Add</Button>
+          <Button color="primary" type="submit">Add</Button>
         </form>
       </div>)
   }

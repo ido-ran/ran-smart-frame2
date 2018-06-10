@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { withStyles } from 'material-ui/styles';
-import { AppBar, Toolbar, Typography, Button, IconButton, Drawer  } from 'material-ui'
-import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
-import { Menu, Home, CameraRoll, CropOriginal } from 'material-ui-icons';
+import { withStyles } from '@material-ui/core/styles';
+import { AppBar, Toolbar, Typography, Button, IconButton, Drawer  } from '@material-ui/core'
+import { List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Menu, Home, CameraRoll, CropOriginal } from '@material-ui/icons';
 
 import { Link  } from 'react-router'
 import './App.css';
@@ -56,13 +56,13 @@ class App extends Component {
       <div>
         <AppBar position="static">
           <Toolbar>
-            <IconButton onClick={this.toggleDrawer(true)} className={classes.menuButton} color="contrast" aria-label="Menu">
+            <IconButton onClick={this.toggleDrawer(true)} className={classes.menuButton} aria-label="Menu">
               <Menu />
             </IconButton>
-            <Typography type="title" color="inherit" className={classes.flex}>
+            <Typography type="title" className={classes.flex}>
               OomkiK
             </Typography>
-            <Button color="contrast">Logout</Button>
+            <Button>Logout</Button>
           </Toolbar>
         </AppBar>
         <Drawer open={this.state.drawer} onRequestClose={this.toggleDrawer(false)}>
@@ -75,7 +75,7 @@ class App extends Component {
           <div className={classes.list}>
             <List>
               <ListItem>
-                <Typography type="title" color="inherit" className={classes.flex}>
+                <Typography type="title" className={classes.flex}>
                   OomkiK
                 </Typography>
               </ListItem>

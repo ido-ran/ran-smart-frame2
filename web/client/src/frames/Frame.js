@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 
-import List, { ListItem, ListItemSecondaryAction, ListItemText } from 'material-ui/List';
-import Checkbox from 'material-ui/Checkbox';
-import { withStyles } from 'material-ui/styles';
-import Avatar from 'material-ui/Avatar';
-import { CameraRoll } from 'material-ui-icons';
+import { List, ListItem, ListItemSecondaryAction, ListItemText } from '@material-ui/core';
+import Checkbox from '@material-ui/core/Checkbox';
+import { withStyles } from '@material-ui/core/styles';
+import Avatar from '@material-ui/core/Avatar';
+import { CameraRoll } from '@material-ui/icons';
 
 import { loadFrame, linkStreamToFrame, unlinkStreamToFrame } from './actions'
 import { loadStreams } from '../streams/actions'

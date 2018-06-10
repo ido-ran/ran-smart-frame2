@@ -3,9 +3,9 @@ import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 import { Link  } from 'react-router'
 
-import { withStyles } from 'material-ui/styles';
-import { GridList, GridListTile } from 'material-ui/GridList';
-import Subheader from 'material-ui/List/ListSubheader';
+import { withStyles } from '@material-ui/core/styles';
+import { GridList, GridListTile } from '@material-ui/core';
+import Subheader from '@material-ui/core/ListSubheader';
 
 import { loadStream, loadStreamPhotos } from './actions'
 import ImageUplaod from './ImageUpload'
