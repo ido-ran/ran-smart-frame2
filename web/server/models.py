@@ -42,3 +42,7 @@ class Frame(ndb.Model):
             'name': self.name,
             'access_key': self.access_key
         }
+
+class GoogleAuth(ndb.Model):
+    """Model an authentication with Google OAuth2"""
+    

@@ -17,8 +17,11 @@ from api.photos import PhotosApi, PhotoApi
 from api.frames import FramesApi, FrameApi
 from api.frame_streams import FrameStreamsApi, FrameStreamApi
 from api.public import PublicApi, PublicPhotoApi
+from auth import GoogleAuthHandler
 
 app = webapp2.WSGIApplication([
+    webapp2.Route(r'/auth/google-auth-callback', GoogleAuthHandler),
+
     webapp2.Route(r'/api/streams', StreamsApi),
     webapp2.Route(r'/api/streams/<id>', StreamApi),
     webapp2.Route(r'/api/streams/<stream_id>/photos', PhotosApi),
@@ -32,5 +35,4 @@ app = webapp2.WSGIApplication([
 
     webapp2.Route(r'/public/api/frames/<id>', PublicApi),
     webapp2.Route(r'/public/api/frames/<frame_id>/streams/<stream_id>/photos/<photo_id>', PublicPhotoApi),
-
 ], debug=True)

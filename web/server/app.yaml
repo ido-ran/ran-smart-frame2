@@ -3,6 +3,10 @@ api_version: 1
 threadsafe: true
 
 handlers:
+- url: /auth/(.*)
+  script: frame_admin.app
+  login: required
+
 - url: /public/api/(.*)
   script: frame_public.app
 

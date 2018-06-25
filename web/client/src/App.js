@@ -54,18 +54,18 @@ class App extends Component {
 
     return (
       <div>
-        <AppBar position="static">
+        <AppBar position="static" color="primary">
           <Toolbar>
-            <IconButton onClick={this.toggleDrawer(true)} className={classes.menuButton} aria-label="Menu">
+            <IconButton onClick={this.toggleDrawer(true)} className={classes.menuButton} color="inherit" aria-label="Menu">
               <Menu />
             </IconButton>
-            <Typography type="title" className={classes.flex}>
+            <Typography type="title" color="inherit" className={classes.flex}>
               OomkiK
             </Typography>
-            <Button>Logout</Button>
+            <Button color="inherit">Logout</Button>
           </Toolbar>
         </AppBar>
-        <Drawer open={this.state.drawer} onRequestClose={this.toggleDrawer(false)}>
+        <Drawer open={this.state.drawer}>
           <div
             tabIndex={0}
             role="button"

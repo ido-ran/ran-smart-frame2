@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 
-import { List, ListItem, ListItemSecondaryAction, ListItemText } from '@material-ui/core';
+import { List, ListItem, ListItemText } from '@material-ui/core';
 import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';

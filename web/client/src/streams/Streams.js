@@ -6,8 +6,11 @@ import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import { List, ListItem, ListItemText } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
+import AddIcon from '@material-ui/icons/Add';
 import { withStyles } from '@material-ui/core/styles';
 import { CameraRoll } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import { loadStreams } from './actions'
 
@@ -16,13 +19,21 @@ const styles = theme => ({
     flexGrow: 1,
     margin: 30,
   },
+  fab: {
+    position: 'absolute',
+    bottom: theme.spacing.unit * 2,
+    right: theme.spacing.unit * 2,
+  },
 });
 
 class Streams extends Component {
 
   constructor() {
     super()
-    this.state = {newStreamName: ''}
+    this.state = {
+      newStreamName: '',
+      addMenuEl: null
+    };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -34,6 +45,7 @@ class Streams extends Component {
 
   render() {
     const { classes } = this.props;
+    const { addMenuEl } = this.state;
 
     return (
       <div className={classes.root}>
@@ -54,10 +66,35 @@ class Streams extends Component {
           <TextField label="Create New Stream" value={this.state.newStreamName} onChange={this.handleChange} />
           <Button color="primary" type="submit">Add</Button>
         </form>
+
+        <Button variant="fab" color="primary" aria-label="add" className={classes.fab} 
+                onClick={this.handleAddButtonClicked}
+                aria-owns={addMenuEl ? 'simple-menu' : null}>
+          <AddIcon />
+        </Button>
+
+        <Menu
+          id="simple-menu"
+          anchorEl={addMenuEl}
+          open={Boolean(addMenuEl)}
+          onClose={this.hanndleAddMenuClosed}
+        >
+          <MenuItem onClick={this.hanndleAddMenuClosed}>Photo Files Album</MenuItem>
+          <MenuItem onClick={this.hanndleAddMenuClosed}
+                    component={Link} to='/streams/add-google-photo-album'>Google Photos Album</MenuItem>
+        </Menu>
+        
       </div>
     );
   }
 
+  handleAddButtonClicked = (event) => {
+    this.setState({ addMenuEl: event.currentTarget });
+  }
+
+  hanndleAddMenuClosed = () => {
+    this.setState({ addMenuEl: null });
+  }
 
   handleChange(event) {
     this.setState({newStreamName: event.target.value});

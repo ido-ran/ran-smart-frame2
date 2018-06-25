@@ -1,7 +1,10 @@
+import { generateAction } from '../actionGenerators'
 
+export const STREAMS_LOAD_START = 'STREAMS_LOAD_START'
 export const STREAMS_LOAD_SUCCESS = 'STREAMS_LOAD_SUCCESS'
 export const STREAMS_LOAD_FAIL = 'STREAMS_LOAD_FAIL'
 
+export const STREAM_LOAD_START = 'STREAM_LOAD_START'
 export const STREAM_LOAD_SUCCESS = 'STREAM_LOAD_SUCCESS'
 export const STREAM_LOAD_FAIL = 'STREAM_LOAD_FAIL'
 
@@ -9,111 +12,23 @@ export const STREAM_PHOTOS_LOADING = 'STREAM_PHOTOS_LOADING'
 export const STREAM_PHOTOS_LOAD_SUCCESS = 'STREAM_PHOTOS_LOAD_SUCCESS'
 export const STREAM_PHOTOS_LOAD_FAIL = 'STREAM_PHOTOS_LOAD_FAIL'
 
-function streamsLoadSuccess(streams) {
-  return {
-    type: STREAMS_LOAD_SUCCESS,
-    payload: streams
-  }
-}
-
-function streamsLoadFail(error) {
-  return {
-    type: STREAMS_LOAD_FAIL,
-    error
-  }
-}
-
 export function loadStreams() {
-  return dispatch => {
-    fetch('/api/streams', {
-      credentials: 'include'
-    })
-    .then(function(response) {
-      var contentType = response.headers.get("content-type")
-      if(response.ok && contentType && contentType.indexOf("application/json") !== -1) {
-        return response.json().then(function(json) {
-          dispatch(streamsLoadSuccess(json))
-        });
-      } else {
-        dispatch(streamsLoadFail())
-      }
-    })
-    .catch(error => dispatch(streamsLoadFail(error)))
-  }
-}
-
-function streamLoadSuccess(stream) {
-  return {
-    type: STREAM_LOAD_SUCCESS,
-    payload: stream
-  }
-}
-
-function streamLoadFail(streamId, error) {
-  return {
-    type: STREAM_LOAD_FAIL,
-    streamId,
-    error
-  }
-}
-
-function streamPhotosLoading(photos) {
-  return {
-    type: STREAM_PHOTOS_LOADING
-  }
-}
-
-function streamPhotosLoadSuccess(photos) {
-  return {
-    type: STREAM_PHOTOS_LOAD_SUCCESS,
-    payload: photos
-  }
-}
-
-function streamPhotosLoadFail(streamId, error) {
-  return {
-    type: STREAM_PHOTOS_LOAD_FAIL,
-    streamId,
-    error
-  }
+  return generateAction('/api/streams', 
+  STREAMS_LOAD_START,
+  STREAMS_LOAD_SUCCESS,
+  STREAMS_LOAD_FAIL);
 }
 
 export function loadStream(streamId) {
-  return dispatch => {
-    fetch(`/api/streams/${streamId}`, {
-      credentials: 'include'
-    })
-    .then(function(response) {
-      var contentType = response.headers.get("content-type")
-      if(response.ok && contentType && contentType.indexOf("application/json") !== -1) {
-        return response.json().then(function(json) {
-          dispatch(streamLoadSuccess(json))
-        });
-      } else {
-        dispatch(streamLoadFail(streamId))
-      }
-    })
-    .catch(error => dispatch(streamLoadFail(streamId, error)))
-  }
+  return generateAction(`/api/streams/${streamId}`, 
+    STREAM_LOAD_START,
+    STREAM_LOAD_SUCCESS,
+    STREAM_LOAD_FAIL);
 }
 
 export function loadStreamPhotos(streamId) {
-  return dispatch => {
-    dispatch(streamPhotosLoading())
-
-    fetch(`/api/streams/${streamId}/photos`, {
-      credentials: 'include'
-    })
-    .then(function(response) {
-      var contentType = response.headers.get("content-type")
-      if(response.ok && contentType && contentType.indexOf("application/json") !== -1) {
-        return response.json().then(function(json) {
-          dispatch(streamPhotosLoadSuccess(json))
-        });
-      } else {
-        dispatch(streamPhotosLoadFail(streamId))
-      }
-    })
-    .catch(error => dispatch(streamPhotosLoadFail(streamId, error)))
-  }
+  return generateAction(`/api/streams/${streamId}/photos`, 
+    STREAM_PHOTOS_LOADING,
+    STREAM_PHOTOS_LOAD_SUCCESS,
+    STREAM_PHOTOS_LOAD_FAIL);
 }
