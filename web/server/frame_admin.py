@@ -18,16 +18,21 @@ from api.frames import FramesApi, FrameApi
 from api.frame_streams import FrameStreamsApi, FrameStreamApi
 from api.public import PublicApi, PublicPhotoApi
 from auth import GoogleAuthHandler
+from api.google_auth_api import GoogleAuthApi
 
 app = webapp2.WSGIApplication([
+
     webapp2.Route(r'/auth/google-auth-callback', GoogleAuthHandler),
+    webapp2.Route(r'/api/google-auth', GoogleAuthApi),
 
     webapp2.Route(r'/api/streams', StreamsApi),
     webapp2.Route(r'/api/streams/<id>', StreamApi),
     webapp2.Route(r'/api/streams/<stream_id>/photos', PhotosApi),
     webapp2.Route(r'/api/streams/<stream_id>/photos/<photo_id>', PhotoApi),
     webapp2.Route(r'/api/streams/<stream_id>/photos/<photo_id>/<photo_label>', PhotoApi),
+
     webapp2.Route(r'/api/me', MeApi),
+    
     webapp2.Route(r'/api/frames', FramesApi),
     webapp2.Route(r'/api/frames/<id>', FrameApi),
     webapp2.Route(r'/api/frames/<frame_id>/streams', FrameStreamsApi),
