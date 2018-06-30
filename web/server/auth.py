@@ -8,6 +8,8 @@ import json
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
+from models import GoogleAuth
+
 class GoogleAuthHandler(webapp2.RequestHandler):
 
     def get(self):
@@ -35,26 +37,31 @@ class GoogleAuthHandler(webapp2.RequestHandler):
             access_token = oauth2Response['access_token'] if 'access_token' in oauth2Response else ''
             refresh_token = oauth2Response['refresh_token'] if 'refresh_token' in oauth2Response else ''
 
+            # Get Google user info including id.
             url = 'https://www.googleapis.com/plus/v1/people/me?key=' + access_token
             headers = {'Authorization': 'Bearer ' + access_token}
             response, content = http.request(url, 'GET', headers=headers)
 
-            self.response.out.write('hello, auth, ' + content)
+            google_user_info = json.loads(content)
+            google_user_id = google_user_info['id']
 
-        # access_key = self.request.get('access_key')
-        # key = ndb.Key('Frame', int(id))
-        # frame = key.get()
+            current_user_id = users.get_current_user().user_id()
 
-        # if (frame is None or frame.access_key != access_key):
-        #     self.response.status = 404
-        #     self.response.write('frame not found')
-        # else:
-        #     streams = [stream.get() for stream in frame.streams]
+            # Try to find exist GoogleAuth record
+            google_auth = GoogleAuth.get_by_user_and_external_user(
+                current_user_id, google_user_id)
 
-        #     frame_with_streams = {
-        #         'frame': frame.serialize(),
-        #         'streams': ([self.serialize_stream(s) for s in streams])
-        #     }
+            if (google_auth is None):
+                # We didn't had this authentication before, create a new one
+                google_auth = GoogleAuth(
+                    user_id = current_user_id,
+                    external_user_id = google_user_id
+                )
 
-        #     self.response.headers['Content-Type'] = 'application/json'
-        #     self.response.out.write(json.dumps(frame_with_streams))
+            google_auth.access_token = access_token
+            google_auth.refrewsh_token = refresh_token
+            google_auth.last_email = google_user_info['emails'][0]['value']
+
+            google_auth.put()
+
+            self.redirect('http://localhost:3000/streams/add-google-photo-album')

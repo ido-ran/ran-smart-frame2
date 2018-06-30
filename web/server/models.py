@@ -45,4 +45,14 @@ class Frame(ndb.Model):
 
 class GoogleAuth(ndb.Model):
     """Model an authentication with Google OAuth2"""
-    
+    external_user_id = ndb.StringProperty(indexed=True)
+    user_id = ndb.StringProperty(indexed=True)
+    last_email = ndb.StringProperty(indexed=False)
+    access_token = ndb.StringProperty(indexed=False)
+    refrewsh_token = ndb.StringProperty(indexed=False)
+    created_at = ndb.DateTimeProperty(auto_now_add=True)
+    updated_at = ndb.DateTimeProperty(auto_now=True)
+
+    @classmethod
+    def get_by_user_and_external_user(cls, user_id, external_user_id):
+        return cls.query().filter(cls.user_id == user_id and cls.external_user_id == external_user_id).get()
