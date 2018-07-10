@@ -39,7 +39,7 @@ class AddGooglePhotoAlbum extends Component {
         <List>
           {this.props.googleAuth.map(googleAuth => (
             <ListItem button key={`googleAuth${googleAuth.id}`}
-                      component={Link} to={`streams/add-google-photo-album/${googleAuth.external_user_id}`}>
+                      component={Link} to={`/streams/add-google-photo-album/${googleAuth.external_user_id}`}>
               <Avatar>
                 <CameraRoll />
               </Avatar>

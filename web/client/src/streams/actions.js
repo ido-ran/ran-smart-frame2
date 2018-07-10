@@ -16,6 +16,10 @@ export const GOOGLE_AUTH_LOAD_START = 'GOOGLE_AUTH_LOAD_START'
 export const GOOGLE_AUTH_LOAD_SUCCESS = 'GOOGLE_AUTH_LOAD_SUCCESS'
 export const GOOGLE_AUTH_LOAD_FAIL = 'GOOGLE_AUTH_LOAD_FAIL'
 
+export const GOOGLE_ALBUMS_LOAD_START = 'GOOGLE_ALBUMS_LOAD_START'
+export const GOOGLE_ALBUMS_LOAD_SUCCESS = 'GOOGLE_ALBUMS_LOAD_SUCCESS'
+export const GOOGLE_ALBUMS_LOAD_FAIL = 'GOOGLE_ALBUMS_LOAD_FAIL'
+
 export function loadStreams() {
   return generateAction('/api/streams', 
   STREAMS_LOAD_START,
@@ -42,4 +46,11 @@ export function loadGoogleAuth() {
   GOOGLE_AUTH_LOAD_START,
   GOOGLE_AUTH_LOAD_SUCCESS,
   GOOGLE_AUTH_LOAD_FAIL);
+}
+
+export function loadGoogleAlbums(googleAuth) {
+  return generateAction(`/api/google-albums/${googleAuth}`, 
+  GOOGLE_ALBUMS_LOAD_START,
+  GOOGLE_ALBUMS_LOAD_SUCCESS,
+  GOOGLE_ALBUMS_LOAD_FAIL);
 }

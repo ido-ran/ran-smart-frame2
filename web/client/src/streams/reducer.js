@@ -3,7 +3,8 @@ import * as types from './actions';
 
 const initStat = {
     loaded: false, items: [],
-    googleAuthLoaded: false, googleAuth: []
+    googleAuthLoaded: false, googleAuth: [],
+    googlePhotoAlbumsLoaded: false, googlePhotoAlbums: []
 }
 
 export default function (state = initStat, action) {
@@ -15,6 +16,12 @@ export default function (state = initStat, action) {
             return Object.assign({}, state, {
                 googleAuthLoaded: true,
                 googleAuth: action.payload
+            })
+        }
+        case types.GOOGLE_ALBUMS_LOAD_SUCCESS: {
+            return Object.assign({}, state, {
+                googlePhotoAlbumsLoaded: true,
+                googlePhotoAlbums: action.payload
             })
         }
         default: {

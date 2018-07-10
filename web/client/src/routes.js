@@ -5,6 +5,7 @@ import Home from './Home';
 import Streams from './streams/Streams'
 import Stream from './streams/Stream'
 import AddGooglePhotoAlbum from './streams/AddGooglePhotoAlbum'
+import SelectGooglePhotoAlbum from './streams/SelectGooglePhotoAlbum'
 import Photo from './streams/Photo'
 import Frames from './frames/Frames'
 import Frame from './frames/Frame'
@@ -16,6 +17,7 @@ const Routes = (props) => (
       <IndexRoute component={Home}/>
       <Route path="/streams" component={Streams} />
       <Route path="/streams/add-google-photo-album" component={AddGooglePhotoAlbum} />
+      <Route path="/streams/add-google-photo-album/:externalUserId" component={SelectGooglePhotoAlbum} />
       <Route path="/streams/:streamId" component={Stream} />
       <Route path="/streams/:streamId/photos/:photoId" component={Photo} />
 

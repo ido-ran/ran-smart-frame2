@@ -59,7 +59,7 @@ class GoogleAuthHandler(webapp2.RequestHandler):
                 )
 
             google_auth.access_token = access_token
-            google_auth.refrewsh_token = refresh_token
+            google_auth.refresh_token = refresh_token
             google_auth.last_email = google_user_info['emails'][0]['value']
 
             google_auth.put()

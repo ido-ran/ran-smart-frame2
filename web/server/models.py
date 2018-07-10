@@ -18,7 +18,7 @@ class GoogleAuth(ndb.Model):
     user_id = ndb.StringProperty(indexed=True)
     last_email = ndb.StringProperty(indexed=False)
     access_token = ndb.StringProperty(indexed=False)
-    refrewsh_token = ndb.StringProperty(indexed=False)
+    refresh_token = ndb.StringProperty(indexed=False)
     created_at = ndb.DateTimeProperty(auto_now_add=True)
     updated_at = ndb.DateTimeProperty(auto_now=True)
 
