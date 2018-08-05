@@ -13,7 +13,7 @@ class StreamsApi(webapp2.RequestHandler):
         owner_streams = Stream.query_by_owner(users.get_current_user().user_id()).fetch()
 
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id())) for g in owner_streams], default=default_json_serializer))
+        self.response.out.write(json.dumps([g.serialize() for g in owner_streams], default=default_json_serializer))
 
     def post(self):
         # We set the same parent key on the 'Greeting' to ensure each
@@ -38,5 +38,5 @@ class StreamApi(webapp2.RequestHandler):
             self.response.write('stream not found')
         else:
             self.response.headers['Content-Type'] = 'application/json'
-            self.response.out.write(json.dumps(dict(stream.to_dict(), **dict(id=stream.key.id())), default=default_json_serializer))
+            self.response.out.write(json.dumps(stream.serialize(), default=default_json_serializer))
             # self.response.out.write(json.dumps(dict(stream.to_dict(), **dict(id=stream.key.id())), default=default_json_serializer))

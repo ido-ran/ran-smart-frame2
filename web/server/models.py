@@ -38,10 +38,20 @@ class Stream(ndb.Model):
     updated_at = ndb.DateTimeProperty(auto_now=True)
     type = ndb.StringProperty(indexed=False, default='files')
     google_auth_key = ndb.KeyProperty(kind=GoogleAuth)
+    google_album_id = ndb.StringProperty(indexed=False, default='')
 
     @classmethod
     def query_by_owner(cls, user_id):
         return cls.query(cls.created_by_user_id == user_id).order(-cls.updated_at)
+
+    def serialize(self):
+        return {
+            'id': self.key.id(),
+            'name': self.name,
+            'created_by_user_id': self.created_by_user_id,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
 
 class Frame(ndb.Model):
     """Model a digital frame"""

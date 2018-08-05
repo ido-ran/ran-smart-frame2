@@ -10,7 +10,8 @@ from oauth2client import client
 from httplib2 import Http
 
 from serializers import default_json_serializer
-from models import GoogleAuth
+from models import GoogleAuth, Stream
+from google_photos import GooglePhotos
 
 class GoogleAlbumsApi(webapp2.RequestHandler):
 
@@ -21,19 +22,9 @@ class GoogleAlbumsApi(webapp2.RequestHandler):
             self.response.status = 404
             self.response.write('GoogleAuth not found')
         else:
-            creds = client.GoogleCredentials(google_auth.access_token, 
-                '226657794555-jp7ph38s8rcpqbu4pjepsg24aphp03qd.apps.googleusercontent.com',
-                'U_Vg-axeRGFDxTyOXDl6oYeO',
-                google_auth.refresh_token,
-                datetime.utcnow(),
-                'https://www.googleapis.com/oauth2/v4/token',
-                'oomkik-1.0')
-            service = build('photoslibrary', 'v1', http=creds.authorize(Http()))
+            google_photos = GooglePhotos()
+            albums = google_photos.get_albums()
 
-            # Call the Photo v1 API
-            results = service.albums().list(
-                pageSize=10, fields="nextPageToken,albums(id,title)").execute()
-            albums = results.get('albums', [])
             if not albums:
                 print 'albums is None'
                 self.response.headers['Content-Type'] = 'application/json'
@@ -45,3 +36,21 @@ class GoogleAlbumsApi(webapp2.RequestHandler):
 
                 self.response.headers['Content-Type'] = 'application/json'
                 self.response.out.write(json.dumps([g for g in albums], default=default_json_serializer))
+
+    def post(self, external_user_id):
+        name = self.request.get('name')
+        google_album_id = self.request.get('googleAlbumId')
+
+        google_auth = GoogleAuth.get_by_user_and_external_user(users.get_current_user().user_id(), external_user_id)
+
+        if (google_auth is None):
+            self.response.status = 404
+            self.response.write('GoogleAuth not found')
+        else:
+            stream = Stream(name = name,
+                            type = 'google-photos-album',
+                            google_auth_key = google_auth.key,
+                            google_album_id = google_album_id,
+                            created_by_user_id=users.get_current_user().user_id())
+            stream.put()
+            self.response.out.write("ok")

@@ -15,17 +15,33 @@ import cloudstorage as gcs
 from serializers import default_json_serializer
 from models import Photo
 from photo_storage import read_photo_from_storage, write_photo_to_storage
+from google_photos import GooglePhotos
 
 class PhotosApi(webapp2.RequestHandler):
 
     def get(self, stream_id):
         stream_key = ndb.Key('Stream', int(stream_id))
+        stream = stream_key.get()
 
-        photos_query = Photo.query(ancestor=stream_key)
-        photos = photos_query.fetch(1000)
+        print('type is ' + stream.type)
+        if (stream.type == 'files'):
+            photos_query = Photo.query(ancestor=stream_key)
+            photos = photos_query.fetch(1000)
 
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id())) for g in photos], default=default_json_serializer))
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id())) for g in photos], default=default_json_serializer))
+
+        elif (stream.type == 'google-photos-album'):
+            google_auth = stream.google_auth_key.get()
+            google_photos = GooglePhotos()
+            photos = google_photos.get_album_photos(google_auth, stream.google_album_id)
+
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(json.dumps([g for g in photos], default=default_json_serializer))
+
+        else:
+            self.response.status = 500
+            self.response.write('stream type not supported')
 
     def post(self, stream_id):
         stream_key = ndb.Key('Stream', int(stream_id))

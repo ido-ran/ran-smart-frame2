@@ -52,7 +52,7 @@ class Streams extends Component {
         <h1>Stream</h1>
         <List>
           {this.props.streams.items.map(stream => (
-            <ListItem button key={`stream${stream.name}`}
+            <ListItem button key={`stream${stream.id}`}
                       component={Link} to={`/streams/${stream.id}`}>
               <Avatar>
                 <CameraRoll />

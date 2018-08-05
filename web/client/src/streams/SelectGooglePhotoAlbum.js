@@ -28,6 +28,24 @@ class SelectGooglePhotoAlbum extends Component {
     this.props.loadGoogleAlbums(this.props.params.externalUserId)
   }
 
+  createStreamFromGoogleAlbum = googleAlbum => (event) => {
+    event.preventDefault();
+
+    const googleAuth = this.props.params.externalUserId;
+
+    const form = new FormData();
+    form.append('googleAlbumId', googleAlbum.id)
+    form.append('name', googleAlbum.title)
+
+    fetch(`/api/google-albums/${googleAuth}`, {
+      method: "POST",
+      body: form,
+      credentials: 'include'
+    }).then((r) => {
+      console.log('album created', r)
+    });
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -37,7 +55,8 @@ class SelectGooglePhotoAlbum extends Component {
 
         <List>
         {this.props.googlePhotoAlbums.map(googleAlbum => (
-            <ListItem button key={`googleAlbum${googleAlbum.id}`}>
+            <ListItem button key={`googleAlbum${googleAlbum.id}`}
+                      onClick={this.createStreamFromGoogleAlbum(googleAlbum)}>
               <Avatar>
                 <CameraRoll />
               </Avatar>
