@@ -15,7 +15,7 @@ import cloudstorage as gcs
 from serializers import default_json_serializer
 from models import Photo
 from photo_storage import read_photo_from_storage, write_photo_to_storage
-from google_photos import GooglePhotos
+from googlephotos.google_photos import GooglePhotos
 
 class PhotosApi(webapp2.RequestHandler):
 
@@ -33,8 +33,8 @@ class PhotosApi(webapp2.RequestHandler):
 
         elif (stream.type == 'google-photos-album'):
             google_auth = stream.google_auth_key.get()
-            google_photos = GooglePhotos()
-            photos = google_photos.get_album_photos(google_auth, stream.google_album_id)
+            google_photos = GooglePhotos(google_auth)
+            photos = google_photos.get_album_photos(stream.google_album_id)
 
             self.response.headers['Content-Type'] = 'application/json'
             self.response.out.write(json.dumps([g for g in photos], default=default_json_serializer))
@@ -101,8 +101,8 @@ class PhotoApi(webapp2.RequestHandler):
             read_photo_from_storage(photo, photo_label, self.response)
         elif (stream.type == 'google-photos-album'):
             google_auth = stream.google_auth_key.get()
-            google_photos = GooglePhotos()
-            photo_url = google_photos.get_album_photo_url(google_auth, photo_id)
+            google_photos = GooglePhotos(google_auth)
+            photo_url = google_photos.get_album_photo_url(photo_id)
 
             if (photo_label == 'main'):
                 photo_url += '=d' # add the download parameter (https://developers.google.com/photos/library/guides/access-media-items#image-base-urls)

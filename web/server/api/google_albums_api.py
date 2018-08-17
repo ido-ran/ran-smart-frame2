@@ -11,7 +11,7 @@ from httplib2 import Http
 
 from serializers import default_json_serializer
 from models import GoogleAuth, Stream
-from google_photos import GooglePhotos
+from googlephotos.google_photos import GooglePhotos
 
 class GoogleAlbumsApi(webapp2.RequestHandler):
 
