@@ -89,10 +89,28 @@ class PhotoApi(webapp2.RequestHandler):
 
     def get(self, stream_id, photo_id, photo_label='main'):
         stream_key = ndb.Key('Stream', int(stream_id))
-        photo_key = ndb.Key('Photo', int(photo_id), parent=stream_key)
-        photo = photo_key.get()
+        stream = stream_key.get()
 
-        bucket_name = os.environ.get('BUCKET_NAME',
-                                     app_identity.get_default_gcs_bucket_name())
+        if (stream.type == 'files'):
+            photo_key = ndb.Key('Photo', int(photo_id), parent=stream_key)
+            photo = photo_key.get()
 
-        read_photo_from_storage(photo, photo_label, self.response)
+            bucket_name = os.environ.get('BUCKET_NAME',
+                                        app_identity.get_default_gcs_bucket_name())
+
+            read_photo_from_storage(photo, photo_label, self.response)
+        elif (stream.type == 'google-photos-album'):
+            google_auth = stream.google_auth_key.get()
+            google_photos = GooglePhotos()
+            photo_url = google_photos.get_album_photo_url(google_auth, photo_id)
+
+            if (photo_label == 'main'):
+                photo_url += '=d' # add the download parameter (https://developers.google.com/photos/library/guides/access-media-items#image-base-urls)
+            else:
+                photo_url += '=w206-h160' # add width & height parameters
+
+            return self.redirect(str(photo_url))
+
+        else:
+            self.response.status = 500
+            self.response.write('stream type not supported')

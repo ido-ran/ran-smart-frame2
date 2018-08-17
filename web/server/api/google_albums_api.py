@@ -23,7 +23,7 @@ class GoogleAlbumsApi(webapp2.RequestHandler):
             self.response.write('GoogleAuth not found')
         else:
             google_photos = GooglePhotos()
-            albums = google_photos.get_albums()
+            albums = google_photos.get_albums(google_auth)
 
             if not albums:
                 print 'albums is None'

@@ -41,3 +41,11 @@ class GooglePhotos:
     ).execute()
     items = results.get('mediaItems', [])
     return items
+
+  def get_album_photo_url(self, google_auth, photo_id):
+    service = self.get_service(google_auth)
+
+    # Call the Photo v1 API
+    results = service.mediaItems().get(mediaItemId=photo_id).execute()
+    items = results.get('baseUrl', '')
+    return items
