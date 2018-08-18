@@ -8,7 +8,7 @@ import Avatar from '@material-ui/core/Avatar';
 import { withStyles } from '@material-ui/core/styles';
 import { CameraRoll } from '@material-ui/icons';
 
-import { loadGoogleAuth } from './actions'
+import { loadGoogleAuth, loadGoogleOAuthEndpoint } from './actions'
 
 const styles = () => ({
   root: {
@@ -27,10 +27,14 @@ class AddGooglePhotoAlbum extends Component {
 
   componentWillMount() {
     this.props.loadGoogleAuth()
+    this.props.loadGoogleOAuthEndpoint()
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, 
+      googleOAuthEndpointLoaded, 
+      googleOAuthEndpoint,
+    } = this.props;
 
     return (
       <div className={classes.root}>
@@ -49,7 +53,7 @@ class AddGooglePhotoAlbum extends Component {
         </List>
 
         <Button color="primary" variant="contained"
-                component='a' href='https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=226657794555-jp7ph38s8rcpqbu4pjepsg24aphp03qd.apps.googleusercontent.com&redirect_uri=http://localhost:8080/auth/google-auth-callback&scope=email%20profile%20https://www.googleapis.com/auth/photoslibrary.readonly&access_type=offline&state=add-google-photo-library-album&include_granted_scopes=true&prompt=consent'>Connect to Google Photos</Button>
+                component='a' href={googleOAuthEndpointLoaded ? googleOAuthEndpoint.oauth_endpoint : ''}>Connect to Google Photos</Button>
       </div>)
   }
 
@@ -57,14 +61,17 @@ class AddGooglePhotoAlbum extends Component {
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
-      loadGoogleAuth
+      loadGoogleAuth,
+      loadGoogleOAuthEndpoint,
     }, dispatch);
 }
 
 function mapStateToProps(state) {
   return {
     googleAuth: state.streams.googleAuth,
-    googleAuthLoaded: state.streams.googleAuthLoaded
+    googleAuthLoaded: state.streams.googleAuthLoaded,
+    googleOAuthEndpointLoaded: state.streams.googleOAuthEndpointLoaded,
+    googleOAuthEndpoint: state.streams.googleOAuthEndpoint,
   };
 }
 

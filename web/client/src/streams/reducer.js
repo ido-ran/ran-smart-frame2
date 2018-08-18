@@ -24,6 +24,12 @@ export default function (state = initStat, action) {
                 googlePhotoAlbums: action.payload
             })
         }
+        case types.GOOGLE_OAUTH_ENDPOINT_LOAD_SUCCESS: {
+            return Object.assign({}, state, {
+                googleOAuthEndpointLoaded: true,
+                googleOAuthEndpoint: action.payload
+            })
+        }
         default: {
             return state;
         }

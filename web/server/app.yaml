@@ -14,6 +14,10 @@ handlers:
   script: frame_admin.app
   login: required
 
+- url: /mgmt/(.*)
+  script: frame_admin.app
+  login: admin
+
 ############### public ##################
 
 - url: /frame-client

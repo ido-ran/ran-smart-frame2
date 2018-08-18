@@ -4,6 +4,8 @@ from apiclient.discovery import build
 from oauth2client import client
 from httplib2 import Http
 
+import params
+
 class GooglePhotos:
   """
   Wrapper class around Google Photos Library client API.
@@ -17,8 +19,8 @@ class GooglePhotos:
 
   def get_service(self):
     creds = client.GoogleCredentials(self.google_auth.access_token, 
-        '226657794555-jp7ph38s8rcpqbu4pjepsg24aphp03qd.apps.googleusercontent.com',
-        'U_Vg-axeRGFDxTyOXDl6oYeO',
+        params.oauth_client_id(),
+        params.oatuh_client_secret(),
         self.google_auth.refresh_token,
         datetime.utcnow(),
         'https://www.googleapis.com/oauth2/v4/token',

@@ -20,11 +20,14 @@ from api.public import PublicApi, PublicPhotoApi
 from auth import GoogleAuthHandler
 from api.google_auth_api import GoogleAuthApi
 from api.google_albums_api import GoogleAlbumsApi
+from api.datastore_upgrade import DatastoreUpgrade
+from api.google_oauth_endpoint import GoogleOAuthEndpointApi
 
 app = webapp2.WSGIApplication([
 
     webapp2.Route(r'/auth/google-auth-callback', GoogleAuthHandler),
     webapp2.Route(r'/api/google-auth', GoogleAuthApi),
+    webapp2.Route(r'/api/google-auth/endpoint', GoogleOAuthEndpointApi),
     webapp2.Route(r'/api/google-albums/<external_user_id>', GoogleAlbumsApi),
 
     webapp2.Route(r'/api/streams', StreamsApi),
@@ -42,4 +45,8 @@ app = webapp2.WSGIApplication([
 
     webapp2.Route(r'/public/api/frames/<id>', PublicApi),
     webapp2.Route(r'/public/api/frames/<frame_id>/streams/<stream_id>/photos/<photo_id>', PublicPhotoApi),
+
+    # Management
+    webapp2.Route(r'/mgmt/upgrade/0001/stream-type', DatastoreUpgrade),
+
 ], debug=True)

@@ -10,6 +10,8 @@ from google.appengine.ext import ndb
 
 from models import GoogleAuth
 
+import params
+
 class GoogleAuthHandler(webapp2.RequestHandler):
 
     def get(self):
@@ -19,9 +21,9 @@ class GoogleAuthHandler(webapp2.RequestHandler):
 
         url = 'https://www.googleapis.com/oauth2/v4/token'   
         body = {'code': code,
-                'client_id': '226657794555-jp7ph38s8rcpqbu4pjepsg24aphp03qd.apps.googleusercontent.com',
-                'client_secret': 'U_Vg-axeRGFDxTyOXDl6oYeO',
-                'redirect_uri': 'http://localhost:8080/auth/google-auth-callback',
+                'client_id': params.oauth_client_id(),
+                'client_secret': params.oatuh_client_secret(),
+                'redirect_uri': params.oauth_redirect_url(self.request),
                 'grant_type': 'authorization_code'
         }
         headers = {'Content-type': 'application/x-www-form-urlencoded'}
