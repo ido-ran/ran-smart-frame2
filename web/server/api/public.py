@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 
 from serializers import clone_for_json
 from models import Frame, Photo
-from photo_storage import read_photo_from_storage
+from logic.streams import get_stream_photos, get_photo
 
 class PublicApi(webapp2.RequestHandler):
 
@@ -32,8 +32,10 @@ class PublicApi(webapp2.RequestHandler):
 
     @staticmethod
     def fetch_photos(stream_key):
-        photos_query = Photo.query(ancestor=stream_key)
-        photos = photos_query.fetch(1000)
+        stream = stream_key.get()
+
+        photos = get_stream_photos(stream)
+        print(photos)
 
         return [g.serialize() for g in photos]
 
@@ -66,14 +68,6 @@ class PublicPhotoApi(webapp2.RequestHandler):
 
         logging.info("found stream {0}".format(stream_key))
 
-        photo_key = ndb.Key('Photo', int(photo_id), parent=stream_key)
-        photo = photo_key.get()
+        stream = stream_key.get()
 
-        if (photo is None):
-            self.response.status = 404
-            self.response.write('photo not found')
-            return
-
-        logging.info("found photo {0}".format(photo))
-
-        read_photo_from_storage(photo, 'main', self.response)
+        get_photo(stream, photo_id, 'main', self)

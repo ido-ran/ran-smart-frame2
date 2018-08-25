@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:appengine": "dev_appserver.py server",
+    "dev:appengine": "dev_appserver.py --enable_host_checking=false server",
     "dev:webpack": "cd client && npm start",
     "dev:frame-client": "cd frame-client && npm start",
     "dev:frame": "concurrently --kill-others --names \"appengine,frame\" --prefix \"[{name}]\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev:appengine\" \"npm run dev:frame-client\"",

@@ -14,8 +14,8 @@ import cloudstorage as gcs
 
 from serializers import default_json_serializer
 from models import Photo
-from photo_storage import read_photo_from_storage, write_photo_to_storage
 from googlephotos.google_photos import GooglePhotos
+from logic.streams import get_stream_photos, get_photo
 
 class PhotosApi(webapp2.RequestHandler):
 
@@ -23,25 +23,14 @@ class PhotosApi(webapp2.RequestHandler):
         stream_key = ndb.Key('Stream', int(stream_id))
         stream = stream_key.get()
 
-        print('type is ' + stream.type)
-        if (stream.type == 'files'):
-            photos_query = Photo.query(ancestor=stream_key)
-            photos = photos_query.fetch(1000)
+        photos = get_stream_photos(stream)
 
-            self.response.headers['Content-Type'] = 'application/json'
-            self.response.out.write(json.dumps([dict(g.to_dict(), **dict(id=g.key.id())) for g in photos], default=default_json_serializer))
-
-        elif (stream.type == 'google-photos-album'):
-            google_auth = stream.google_auth_key.get()
-            google_photos = GooglePhotos(google_auth)
-            photos = google_photos.get_album_photos(stream.google_album_id)
-
-            self.response.headers['Content-Type'] = 'application/json'
-            self.response.out.write(json.dumps([g for g in photos], default=default_json_serializer))
-
-        else:
+        if (photos is None):
             self.response.status = 500
             self.response.write('stream type not supported')
+        else:
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(json.dumps([g.serialize() for g in photos], default=default_json_serializer))
 
     def post(self, stream_id):
         stream_key = ndb.Key('Stream', int(stream_id))
@@ -91,26 +80,4 @@ class PhotoApi(webapp2.RequestHandler):
         stream_key = ndb.Key('Stream', int(stream_id))
         stream = stream_key.get()
 
-        if (stream.type == 'files'):
-            photo_key = ndb.Key('Photo', int(photo_id), parent=stream_key)
-            photo = photo_key.get()
-
-            bucket_name = os.environ.get('BUCKET_NAME',
-                                        app_identity.get_default_gcs_bucket_name())
-
-            read_photo_from_storage(photo, photo_label, self.response)
-        elif (stream.type == 'google-photos-album'):
-            google_auth = stream.google_auth_key.get()
-            google_photos = GooglePhotos(google_auth)
-            photo_url = google_photos.get_album_photo_url(photo_id)
-
-            if (photo_label == 'main'):
-                photo_url += '=d' # add the download parameter (https://developers.google.com/photos/library/guides/access-media-items#image-base-urls)
-            else:
-                photo_url += '=w206-h160' # add width & height parameters
-
-            return self.redirect(str(photo_url))
-
-        else:
-            self.response.status = 500
-            self.response.write('stream type not supported')
+        get_photo(stream, photo_id, photo_label, self)
