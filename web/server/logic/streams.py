@@ -21,7 +21,7 @@ def get_stream_photos(stream):
   if (stream.type == 'files'):
     photos_query = Photo.query(ancestor=stream.key)
     photos = photos_query.fetch(1000)
-    return [PhotoInfo(photo.id) for photo in photos]    
+    return [PhotoInfo(photo.key.id()) for photo in photos]    
 
   elif (stream.type == 'google-photos-album'):
     google_auth = stream.google_auth_key.get()
