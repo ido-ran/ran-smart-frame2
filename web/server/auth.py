@@ -66,4 +66,5 @@ class GoogleAuthHandler(webapp2.RequestHandler):
 
             google_auth.put()
 
-            self.redirect('http://localhost:3000/streams/add-google-photo-album')
+            frontend_base_url = params.app_frontend_base_url(self.request)
+            self.redirect('{}/streams/add-google-photo-album/{}'.format(frontend_base_url, google_user_id))
