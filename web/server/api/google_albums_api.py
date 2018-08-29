@@ -53,4 +53,6 @@ class GoogleAlbumsApi(webapp2.RequestHandler):
                             google_album_id = google_album_id,
                             created_by_user_id=users.get_current_user().user_id())
             stream.put()
-            self.response.out.write("ok")
+
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(json.dumps(stream.serialize(), default=default_json_serializer))
