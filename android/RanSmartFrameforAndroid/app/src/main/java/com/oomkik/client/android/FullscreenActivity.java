@@ -15,10 +15,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.android.volley.Request;
@@ -61,6 +64,12 @@ public class FullscreenActivity extends AppCompatActivity {
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
+
+    /**
+     * The delay (in ms) to switch to the next photo.
+     */
+    private static final int FRAME_SWITCH_PHOTO_DELAY_MS = 6000;
+
     private final Handler mHideHandler = new Handler();
     private ImageView mContentView;
     private Button mDummyButton;
@@ -95,7 +104,7 @@ public class FullscreenActivity extends AppCompatActivity {
                     .fitCenter()
                     .into(mContentView);
 
-            mHandler.postDelayed(mShowNextPhoto, 20000);
+            mHandler.postDelayed(mShowNextPhoto, FRAME_SWITCH_PHOTO_DELAY_MS);
         }
     };
 
@@ -108,12 +117,18 @@ public class FullscreenActivity extends AppCompatActivity {
             // Note that some of these constants are new as of API 16 (Jelly Bean)
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+            View decorView = getWindow().getDecorView();
+            mContentView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LOW_PROFILE
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+
+            FrameLayout fl = findViewById(R.id.frame_layout);
+            fl.setFitsSystemWindows(false);
         }
     };
     private View mControlsView;
@@ -196,8 +211,7 @@ public class FullscreenActivity extends AppCompatActivity {
         mDummyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent selectFrameIntent = new Intent(FullscreenActivity.this, SelectFrameActivity.class);
-                startActivityForResult(selectFrameIntent, 0);
+                navigateToSettings();
             }
         });
 
@@ -208,6 +222,11 @@ public class FullscreenActivity extends AppCompatActivity {
         mgr.registerReceiver(mHandleQuickBroadcast, new IntentFilter("quit-please"));
 
         scheduleShutdownTimer();
+    }
+
+    private void navigateToSettings() {
+        Intent selectFrameIntent = new Intent(FullscreenActivity.this, SelectFrameActivity.class);
+        startActivityForResult(selectFrameIntent, 0);
     }
 
     private void scheduleShutdownTimer() {
@@ -251,6 +270,24 @@ public class FullscreenActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.fullscreen_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                navigateToSettings();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void saveSelectedFrame(String frameName, String id, String accessKey) {
         getPreferences().edit()
                 .putString("frameName", frameName)
@@ -282,6 +319,9 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void fetchFrameData() {
+
+        // DEBUG
+        saveSelectedFrame("debug", "5722646637445120", "paAseXTZBaxhJR3DRZDpOvd6gC6EY2q8hKF1eARf");
 
         final FrameInfo selectedFrame = loadSelectedFrame();
         if (selectedFrame == null) {
@@ -412,8 +452,15 @@ public class FullscreenActivity extends AppCompatActivity {
     @SuppressLint("InlinedApi")
     private void show() {
         // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        View decorView = getWindow().getDecorView();
+        mContentView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        );
+
+        FrameLayout fl = findViewById(R.id.frame_layout);
+        fl.setFitsSystemWindows(true);
+
         mVisible = true;
 
         // Schedule a runnable to display UI elements after a delay

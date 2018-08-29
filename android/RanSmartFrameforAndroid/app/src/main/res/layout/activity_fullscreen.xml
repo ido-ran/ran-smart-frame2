@@ -2,16 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/image_fill"
-    tools:context="com.oomkik.client.android.FullscreenActivity">
+    tools:context="com.oomkik.client.android.FullscreenActivity"
+    android:fitsSystemWindows="true">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
-    <ImageView
-        android:id="@+id/image_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
@@ -19,14 +17,16 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
-        <Button
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
-    </android.support.v7.widget.Toolbar>
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"></android.support.v7.widget.Toolbar>
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
