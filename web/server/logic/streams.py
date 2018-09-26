@@ -27,8 +27,6 @@ def get_stream_photos(stream):
     google_auth = stream.google_auth_key.get()
     google_photos = GooglePhotos(google_auth)
     photos = google_photos.get_album_photos(stream.google_album_id)
-    print('google-photos')
-    print(photos)
     return [PhotoInfo(photo['id']) for photo in photos]
 
   return photos

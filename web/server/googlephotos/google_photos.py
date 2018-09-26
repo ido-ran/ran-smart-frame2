@@ -1,3 +1,5 @@
+import logging
+
 from datetime import datetime
 
 from apiclient.discovery import build
@@ -5,6 +7,8 @@ from oauth2client import client
 from httplib2 import Http
 
 import params
+
+logger = logging.getLogger(__name__)
 
 class GooglePhotos:
   """
@@ -38,6 +42,7 @@ class GooglePhotos:
   def get_album_photos(self, album_id):
     # Call the Photo v1 API
     # The search method is expecting a single kwarg name `body`.
+    logger.info('Requesting Google Photos Album. albumId: %s', album_id)
     results = self.service.mediaItems().search(
       body = { 'albumId': album_id }
     ).execute()

@@ -35,7 +35,6 @@ class PublicApi(webapp2.RequestHandler):
         stream = stream_key.get()
 
         photos = get_stream_photos(stream)
-        print(photos)
 
         return [g.serialize() for g in photos]
 
