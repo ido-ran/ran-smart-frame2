@@ -27,7 +27,7 @@ task build (dependsOn: [buildFrameClient, buildClient]) {
 task deployIndex(type: Exec) {
   inputs.file 'server/index.yaml'
   outputs.file 'server/index.yaml'
-  commandLine 'cmd', '/c', 'gcloud', 'app', 'deploy', '--project', appEngineProject, '-v', appEngineVersion, 'server/index.yaml'
+  commandLine 'gcloud', 'app', 'deploy', '--project', appEngineProject, '-v', appEngineVersion, 'server/index.yaml'
 }
 
 task deployProject(type: Exec, dependsOn: deployIndex) {
@@ -36,7 +36,7 @@ task deployProject(type: Exec, dependsOn: deployIndex) {
 
   inputs.dir 'server'
   outputs.dir 'server'
-  commandLine 'cmd', '/c', 'gcloud', 'app', 'deploy', '--no-promote', '--project', appEngineProject, '-v', appEngineVersion, 'server/app.yaml'
+  commandLine 'gcloud', 'app', 'deploy', '--no-promote', '--project', appEngineProject, '-v', appEngineVersion, 'server/app.yaml'
 }
 
 task deploy(dependsOn: [build, deployProject]) {
