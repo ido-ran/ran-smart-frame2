@@ -1,6 +1,8 @@
 package com.oomkik.client.android;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.webkit.CookieManager;
@@ -26,6 +28,11 @@ public class SelectFrameActivity extends AppCompatActivity {
 
         // Clear cookies to clear any previous login cookies
         CookieManager.getInstance().removeAllCookie();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE))
+            { WebView.setWebContentsDebuggingEnabled(true); }
+        }
 
         mWebView.loadUrl(Apis.API_ROOT_URL + "/select-frame");
     }
