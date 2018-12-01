@@ -1,3 +1,6 @@
+import 'core-js/es6/map';
+import 'core-js/es6/set';
+
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { AppBar, Toolbar, Typography, Button, IconButton, Drawer  } from '@material-ui/core'
