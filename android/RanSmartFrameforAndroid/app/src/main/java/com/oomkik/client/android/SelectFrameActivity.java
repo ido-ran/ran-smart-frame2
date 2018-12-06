@@ -1,12 +1,8 @@
 package com.oomkik.client.android;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.webkit.CookieManager;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -16,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 public class SelectFrameActivity extends AppCompatActivity {
 
-    private WebView mWebView;
     private IntentIntegrator mBarcodeReadIntent;
 
     @Override
@@ -37,6 +32,7 @@ public class SelectFrameActivity extends AppCompatActivity {
 //        vrQQ4kFIgHkkTMQ83n2QXHSxUpotyYSD0biWWPBn
 
         mBarcodeReadIntent = new IntentIntegrator(this)
+                .setTimeout(TimeUnit.MINUTES.toMillis(2))
                 .setPrompt("Scan Oomkik Frame QR-Code");
 
         mBarcodeReadIntent.initiateScan();
