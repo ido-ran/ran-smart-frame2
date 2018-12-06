@@ -12,29 +12,77 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.util.concurrent.TimeUnit;
+
 public class SelectFrameActivity extends AppCompatActivity {
 
     private WebView mWebView;
+    private IntentIntegrator mBarcodeReadIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_frame);
 
-        new IntentIntegrator(this).initiateScan();
+//        processQRCode("oomkik\n" +
+//                "1\n" +
+//                "Lavie Eatty and Dani\n" +
+//                "5650622250483712\n" +
+//                "vrQQ4kFIgHkkTMQ83n2QXHSxUpotyYSD0biWWPBn");
+
+//        oomkik
+//        1
+//        Lavie Eatty and Dani
+//        5650622250483712
+//        vrQQ4kFIgHkkTMQ83n2QXHSxUpotyYSD0biWWPBn
+
+        mBarcodeReadIntent = new IntentIntegrator(this)
+                .setPrompt("Scan Oomkik Frame QR-Code");
+
+        mBarcodeReadIntent.initiateScan();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if(result != null) {
-            if(result.getContents() == null) {
-                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+        if (result != null) {
+            if (result.getContents() == null) {
+                returnCancelResult();
             } else {
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                processQRCode(result.getContents());
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void processQRCode(String data) {
+        String[] parts = data.split("[\r\n]+");
+
+        if (parts.length != 5 || !parts[0].equals("oomkik") || !parts[1].equals("1")) {
+            Toast.makeText(this, "This is not an Oomkik frame QR Code", Toast.LENGTH_LONG).show();
+        }
+
+        String frameName = parts[2];
+        String frameId = parts[3];
+        String accessKey = parts[4];
+
+        // TODO: we can probably do better validation here
+        returnSelectedFrameResult(frameName, frameId, accessKey);
+    }
+
+    private void returnCancelResult() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    private void returnSelectedFrameResult(String frameName, String frameId, String accessKey) {
+        Intent result = new Intent();
+        result.putExtra("name", frameName);
+        result.putExtra("id", frameId);
+        result.putExtra("accessKey", accessKey);
+
+        setResult(RESULT_OK, result);
+        finish();
     }
 }

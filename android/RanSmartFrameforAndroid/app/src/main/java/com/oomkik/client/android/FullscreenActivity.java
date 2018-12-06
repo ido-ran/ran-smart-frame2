@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
@@ -68,7 +70,7 @@ public class FullscreenActivity extends AppCompatActivity {
     /**
      * The delay (in ms) to switch to the next photo.
      */
-    private static final int FRAME_SWITCH_PHOTO_DELAY_MS = 6000;
+    private long FRAME_SWITCH_PHOTO_DELAY_MS = TimeUnit.SECONDS.toMillis(20);
 
     private final Handler mHideHandler = new Handler();
     private ImageView mContentView;
@@ -187,7 +189,14 @@ public class FullscreenActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_fullscreen);
 
-        // Keep screen on all the time
+        // During debug session we change the photo switch delay to be 10 seconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+                FRAME_SWITCH_PHOTO_DELAY_MS = TimeUnit.SECONDS.toMillis(10);
+            }
+        }
+
+            // Keep screen on all the time
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -319,9 +328,6 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void fetchFrameData() {
-
-        // DEBUG
-        saveSelectedFrame("debug", "5722646637445120", "paAseXTZBaxhJR3DRZDpOvd6gC6EY2q8hKF1eARf");
 
         final FrameInfo selectedFrame = loadSelectedFrame();
         if (selectedFrame == null) {
