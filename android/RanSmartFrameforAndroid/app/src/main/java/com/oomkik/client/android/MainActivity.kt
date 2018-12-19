@@ -1,5 +1,6 @@
 package com.oomkik.client.android
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
@@ -9,15 +10,17 @@ import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.ArrayList
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 class MainActivity : AppCompatActivity() {
+
+    private val SLIDESHOW_NOT_RUNNING = -1;
 
     private val mHideHandler = Handler()
     private val mHidePart2Runnable = Runnable {
@@ -61,7 +64,9 @@ class MainActivity : AppCompatActivity() {
 
     private var mPhotoUrls: List<String> = emptyList()
     private val mHandler = Handler()
-    private var mPhotoIndex = -1
+    private var mPhotoIndex = SLIDESHOW_NOT_RUNNING
+
+    private lateinit var mViewModel: PhotosViewModel
 
     /**
      * The delay (in ms) to switch to the next photo.
@@ -94,6 +99,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        HttpSingleton.queue = Volley.newRequestQueue(this)
+
         setContentView(R.layout.activity_main)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -107,10 +114,13 @@ class MainActivity : AppCompatActivity() {
         // while interacting with the UI.
         dummy_button.setOnTouchListener(mDelayHideTouchListener)
 
-        var viewModel = ViewModelProviders.of(this).get(PhotosViewModel::class.java)
-        viewModel.getPhotos().observe(this, Observer {
+        mViewModel = ViewModelProviders.of(this).get(PhotosViewModel::class.java)
+        mViewModel.getPhotos().observe(this, Observer {
             mPhotoUrls = if (it == null) emptyList() else it
-            startShowPhotos()
+
+            if (mPhotoIndex == SLIDESHOW_NOT_RUNNING) {
+                startShowPhotos()
+            }
         })
     }
 
@@ -148,6 +158,26 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(selectFrameIntent, 0)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_CANCELED) {
+            val frameInfo = FrameInfo(
+                    "Lavie Eatty and Dani",
+                    "5650622250483712",
+                    "vrQQ4kFIgHkkTMQ83n2QXHSxUpotyYSD0biWWPBn"
+            )
+            mViewModel.reloadPhotos(frameInfo);
+
+        }
+        else if (resultCode == Activity.RESULT_OK && data != null) {
+            val frameInfo = FrameInfo(
+                    data.getStringExtra("name"),
+                    data.getStringExtra("id"),
+                    data.getStringExtra("accessKey")
+            )
+
+            mViewModel.reloadPhotos(frameInfo);
+        }
+    }
 
     private fun toggle() {
         if (mVisible) {
