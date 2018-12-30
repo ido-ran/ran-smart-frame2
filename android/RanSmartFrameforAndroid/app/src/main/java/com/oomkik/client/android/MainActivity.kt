@@ -3,7 +3,10 @@ package com.oomkik.client.android
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.pm.ApplicationInfo
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -115,6 +118,13 @@ class MainActivity : AppCompatActivity() {
         dummy_button.setOnTouchListener(mDelayHideTouchListener)
 
         mViewModel = ViewModelProviders.of(this).get(PhotosViewModel::class.java)
+
+        // Load saved frame info
+        val savedFrameInfo = loadSelectedFrame()
+        if (savedFrameInfo != null) {
+            mViewModel.reloadPhotos(savedFrameInfo)
+        }
+
         mViewModel.getPhotos().observe(this, Observer {
             mPhotoUrls = if (it == null) emptyList() else it
 
@@ -160,22 +170,67 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_CANCELED) {
-            val frameInfo = FrameInfo(
-                    "Lavie Eatty and Dani",
-                    "5650622250483712",
-                    "vrQQ4kFIgHkkTMQ83n2QXHSxUpotyYSD0biWWPBn"
-            )
-            mViewModel.reloadPhotos(frameInfo);
 
-        }
-        else if (resultCode == Activity.RESULT_OK && data != null) {
+            // For debug pruposes, we load specific frame
+            if (isDebugVersion()) {
+                val frameInfo = FrameInfo(
+                        "Debug Frame",
+                        "5676073085829120",
+                        "X9v3TB4Dvpz9k8bYPHa3pApJqiBwbCcoiHwhzQJp"
+                )
+
+                reloadFrame(frameInfo)
+            }
+
+        } else if (resultCode == Activity.RESULT_OK && data != null) {
             val frameInfo = FrameInfo(
                     data.getStringExtra("name"),
                     data.getStringExtra("id"),
                     data.getStringExtra("accessKey")
             )
+            reloadFrame(frameInfo)
+        }
+    }
 
-            mViewModel.reloadPhotos(frameInfo);
+    private fun reloadFrame(frameInfo: FrameInfo) {
+        saveSelectedFrame(frameInfo)
+        mViewModel.reloadPhotos(frameInfo)
+    }
+
+    private fun isDebugVersion(): Boolean {
+        return 0 != applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
+    }
+
+    private fun saveSelectedFrame(frameInfo: FrameInfo) {
+        getPreferences().edit()
+                .putString("frameName", frameInfo.frameName)
+                .putString("frameId", frameInfo.id)
+                .putString("frameAccessKey", frameInfo.accessKey)
+                .apply()
+    }
+
+    private fun getPreferences(): SharedPreferences {
+        return getPreferences(Context.MODE_PRIVATE)
+    }
+
+    private fun loadSelectedFrame(): FrameInfo? {
+        val pref = getPreferences()
+
+        val frameName = pref.getString("frameName", null)
+        val id = pref.getString("frameId", null)
+        val accessKey = pref.getString("frameAccessKey", null)
+
+        return if (
+                frameName == null ||
+                id == null ||
+                accessKey == null) {
+
+            // if any of the fields are null we ignore the stored preferences
+            null
+
+        } else {
+            val selectedFrame = FrameInfo(frameName, id, accessKey)
+            selectedFrame
         }
     }
 
