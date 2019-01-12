@@ -44,7 +44,10 @@ class GooglePhotos:
     # The search method is expecting a single kwarg name `body`.
     logger.info('Requesting Google Photos Album. albumId: %s', album_id)
     results = self.service.mediaItems().search(
-      body = { 'albumId': album_id }
+      body = { 
+        'albumId': album_id,
+        'pageSize': 100, # request for the maximum of 100 photos per request
+      }
     ).execute()
     items = results.get('mediaItems', [])
     return items
