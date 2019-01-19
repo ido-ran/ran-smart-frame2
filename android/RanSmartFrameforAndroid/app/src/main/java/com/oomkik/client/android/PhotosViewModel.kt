@@ -1,8 +1,9 @@
 package com.oomkik.client.android
 
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.util.Log
 import com.android.volley.Request
 import com.android.volley.Response
@@ -11,15 +12,20 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.text.MessageFormat
 
-class PhotosViewModel : ViewModel() {
+class PhotosViewModel(app: Application) : AndroidViewModel(app) {
 
     private var photos: MutableLiveData<List<String>> = MutableLiveData()
+    private val photosCache: PhotosListCache = PhotosListCache(app)
 
     init {
-        photos.value = listOf(
-                "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?cs=srgb&dl=beach-exotic-holiday-248797.jpg&fm=jpg",
-                "https://images.pexels.com/photos/260573/pexels-photo-260573.jpeg?cs=srgb&dl=beach-boat-island-260573.jpg&fm=jpg"
-        )
+        try {
+            photos.value = photosCache.load();
+        } catch (e: Exception) {
+            photos.value = listOf(
+                    "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?cs=srgb&dl=beach-exotic-holiday-248797.jpg&fm=jpg",
+                    "https://images.pexels.com/photos/260573/pexels-photo-260573.jpeg?cs=srgb&dl=beach-boat-island-260573.jpg&fm=jpg"
+            )
+        }
     }
 
     /**
@@ -38,6 +44,8 @@ class PhotosViewModel : ViewModel() {
         val request = JsonObjectRequest(Request.Method.GET, url, null, Response.Listener { response ->
             val listOfPhotos = ArrayList<String>()
             parseResponse(response, frameInfo, listOfPhotos)
+
+            photosCache.save(listOfPhotos);
             photos.value = listOfPhotos
 //            saveFrameData(response.toString())
         },
