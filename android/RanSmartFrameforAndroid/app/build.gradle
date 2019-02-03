@@ -13,8 +13,8 @@ android {
         applicationId "com.oomkik.client.android"
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 14
-        versionName "0.1.14"
+        versionCode 15
+        versionName "0.1.15"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
