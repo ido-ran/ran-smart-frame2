@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                 mPhotoIndex = 0
             }
 
-            GlideApp.with(this@MainActivity)
+            GlideApp.with(applicationContext)
                     .load(mPhotoUrls.get(mPhotoIndex))
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .fitCenter()
