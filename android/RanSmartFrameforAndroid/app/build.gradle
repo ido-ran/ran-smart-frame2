@@ -57,6 +57,11 @@ dependencies {
 
     // optional - Test helpers for LiveData
     testImplementation "android.arch.core:core-testing:$lifecycle_version"
+
+    // We use this implementation of json for testing
+    // because for unit test JsonObject from android.jar
+    // is not available.
+    testImplementation 'org.json:json:20180130'
 }
 
 apply plugin: 'kotlin-android'
