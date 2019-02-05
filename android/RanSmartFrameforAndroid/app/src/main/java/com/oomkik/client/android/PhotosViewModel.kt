@@ -14,17 +14,33 @@ import java.text.MessageFormat
 
 class PhotosViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var photos: MutableLiveData<List<String>> = MutableLiveData()
+    private val tracer = Tracer()
     private val photosCache: PhotosListCache = PhotosListCache(app)
+
+    private var photos: MutableLiveData<List<String>> = MutableLiveData()
 
     init {
         try {
             photos.value = photosCache.load();
+
+            if (photos.value == null) {
+                tracer.event("PhotosViewModel.init", mapOf(
+                        "numOfPhotos" to "null"
+                ))
+            } else {
+                tracer.event("PhotosViewModel.init", mapOf(
+                        "numOfPhotos" to photos.value?.size
+                ))
+            }
         } catch (e: Exception) {
             photos.value = listOf(
                     "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?cs=srgb&dl=beach-exotic-holiday-248797.jpg&fm=jpg",
                     "https://images.pexels.com/photos/260573/pexels-photo-260573.jpeg?cs=srgb&dl=beach-boat-island-260573.jpg&fm=jpg"
             )
+
+            tracer.event("PhotosViewModel.init.failed", mapOf(
+                    "exception" to (e.message ?: "no-exception-message")
+            ))
         }
     }
 

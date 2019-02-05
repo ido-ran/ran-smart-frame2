@@ -6,6 +6,8 @@ import java.text.MessageFormat
 
 class PhotosJsonParser {
 
+    private val tracer = Tracer()
+
     /**
      * Parse Oomkik photo stream response.
      *
@@ -35,10 +37,18 @@ class PhotosJsonParser {
 
             }
 
+            tracer.event("PhotosJsonParser.parseResponse", mapOf("frameId" to selectedFrame.id))
+
             return listOfPhotos
 
         } catch (e: JSONException) {
             e.printStackTrace()
+
+            tracer.event("PhotosJsonParser.parseResponse.failed", mapOf(
+                    "frameId" to selectedFrame.id,
+                    "exception" to (e.message ?: "no-exception-message")
+            ))
+
             return null
         }
 

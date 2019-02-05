@@ -15,6 +15,8 @@ import android.view.MenuItem
 import android.view.View
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.firebase.FirebaseApp
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -103,6 +105,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         HttpSingleton.queue = Volley.newRequestQueue(this)
+
+        UniqueIdKeeper.uniqueId = UniqueId().id(applicationContext)
 
         setContentView(R.layout.activity_main)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
