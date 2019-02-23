@@ -8,6 +8,11 @@ This project is made up of 3 components:
 1. Admin interface written in React
 1. Frame interface written in Elm
 
+## Dev Setup
+
+[Android App](android\README.md)
+[Web apps](web\README.md)
+
 ## Development
 
 Run `npm start` to start all the development components require to run this app.
