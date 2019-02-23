@@ -10,7 +10,8 @@
     "dev:frame-client": "cd frame-client && npm start",
     "dev:frame": "concurrently --kill-others --names \"appengine,frame\" --prefix \"[{name}]\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev:appengine\" \"npm run dev:frame-client\"",
     "dev:admin": "concurrently --kill-others --names \"appengine,admin\" --prefix \"[{name}]\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run dev:appengine\" \"npm run dev:webpack\"",
-    "start": "concurrently --kill-others --names \"appengine,admin,frame\" --prefix \"[{name}]\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run dev:appengine\" \"npm run dev:webpack\" \"npm run dev:frame-client\""
+    "dev:all": "concurrently --kill-others --names \"appengine,admin,frame\" --prefix \"[{name}]\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run dev:appengine\" \"npm run dev:webpack\" \"npm run dev:frame-client\"",
+    "start": "npm run dev:admin"
   },
   "keywords": [
     "appengine",
