@@ -38,14 +38,14 @@ class GoogleAuthHandler(webapp2.RequestHandler):
         else:
             access_token = oauth2Response['access_token'] if 'access_token' in oauth2Response else ''
             refresh_token = oauth2Response['refresh_token'] if 'refresh_token' in oauth2Response else ''
+            id_token = oauth2Response['id_token'] if 'id_token' in oauth2Response else ''
 
             # Get Google user info including id.
-            url = 'https://www.googleapis.com/plus/v1/people/me?key=' + access_token
-            headers = {'Authorization': 'Bearer ' + access_token}
-            response, content = http.request(url, 'GET', headers=headers)
+            url = 'https://oauth2.googleapis.com/tokeninfo?id_token=' + id_token
+            response, content = http.request(url, 'GET')
 
             google_user_info = json.loads(content)
-            google_user_id = google_user_info['id']
+            google_user_id = google_user_info['sub']
 
             current_user_id = users.get_current_user().user_id()
 
@@ -62,7 +62,7 @@ class GoogleAuthHandler(webapp2.RequestHandler):
 
             google_auth.access_token = access_token
             google_auth.refresh_token = refresh_token
-            google_auth.last_email = google_user_info['emails'][0]['value']
+            google_auth.last_email = google_user_info['email']
 
             google_auth.put()
 
