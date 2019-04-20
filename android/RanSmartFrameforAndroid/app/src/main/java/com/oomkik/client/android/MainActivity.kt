@@ -209,7 +209,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getPreferences(): SharedPreferences {
-        return getPreferences(Context.MODE_PRIVATE)
+        return getSharedPreferences("oomkik-preferences", Context.MODE_PRIVATE)
     }
 
     private fun loadSelectedFrame(): FrameInfo? {
