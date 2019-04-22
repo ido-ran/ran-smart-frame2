@@ -72,3 +72,11 @@ class Frame(ndb.Model):
             'name': self.name,
             'access_key': self.access_key
         }
+
+class DeviceLink(ndb.Model):
+    """Model the information for the process to link a device to a frame"""
+    device_ip = ndb.StringProperty(indexed=False)
+    secret = ndb.StringProperty(indexed=True)
+    created_at = ndb.DateTimeProperty(auto_now_add=True)
+    updated_at = ndb.DateTimeProperty(auto_now=True)
+    frame_key = ndb.KeyProperty(kind=Frame)

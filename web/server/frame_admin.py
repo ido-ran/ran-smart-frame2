@@ -46,6 +46,8 @@ app = webapp2.WSGIApplication([
     webapp2.Route(r'/public/api/frames/<id>', PublicApi),
     webapp2.Route(r'/public/api/frames/<frame_id>/streams/<stream_id>/photos/<photo_id>', PublicPhotoApi),
 
+    # TODO: add route to link a frame to a DeviceLink instance
+
     # Management
     webapp2.Route(r'/mgmt/upgrade/0001/stream-type', DatastoreUpgrade),
 
