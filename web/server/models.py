@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from google.appengine.ext import ndb
+from google.appengine.api import users
 
 class Photo(ndb.Model):
     """Model a single photo in a stream"""
@@ -72,6 +75,12 @@ class Frame(ndb.Model):
             'name': self.name,
             'access_key': self.access_key
         }
+    
+    def current_user_has_access(self):
+        """ Check if the current user has access to this frame """
+        current_user_id = users.get_current_user().user_id()
+        return self.created_by_user_id == current_user_id
+
 
 class DeviceLink(ndb.Model):
     """Model the information for the process to link a device to a frame"""
@@ -80,3 +89,29 @@ class DeviceLink(ndb.Model):
     created_at = ndb.DateTimeProperty(auto_now_add=True)
     updated_at = ndb.DateTimeProperty(auto_now=True)
     frame_key = ndb.KeyProperty(kind=Frame)
+
+    @classmethod
+    def get_by_secret(cls, secret):
+        """ Get (if exists) the latest DeviceLink matching the secret that is valid """
+        candidate = cls.query().filter(cls.secret == secret).order(-cls.created_at).get()
+        if candidate and not candidate.is_valid_to_link():
+            candidate = None
+        
+        return candidate
+
+    def is_valid_to_link(self):
+        """ Check if this DeviceLink valid to link a frame to """
+        
+        # If this DeviceLink is already linked, it is not valid for linking...
+        if (self.frame_key):
+            return False
+
+        return not self.is_time_valid()
+
+    def is_time_valid(self):
+        """ Check if this DeviceLink is still valid """
+        now = datetime.now()
+        time_delta = now - self.created_at
+        minutes_since_created = time_delta.total_seconds() / 60
+
+        return (minutes_since_created < 5)

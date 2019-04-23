@@ -6,25 +6,24 @@ import logging
 from datetime import datetime
 
 from google.appengine.ext import ndb
+from google.appengine.api import users
 
 from serializers import default_json_serializer, clone_for_json
 
 from models import DeviceLink
 
 class DeviceLinkStart(webapp2.RequestHandler):
+    """DeviceLinkStart manages starting a device link from a device
+
+    See `Device Link diagram <../../docs/link-device-to-frame.md>`_ for more details about device linking.
+    """
 
     def get(self, link_id):
         link_key = ndb.Key(DeviceLink, int(link_id))
         device_link = link_key.get()
 
         # If the device link was created more than 5 minutes ago, ignore this call
-        now = datetime.now()
-        time_delta = now - device_link.created_at
-        minutes_since_created = time_delta.total_seconds() / 60
-
-        logging.info('**** min since created: ' + str(minutes_since_created))
-
-        if (minutes_since_created > 5):
+        if (not device_link or not device_link.is_time_valid()):
             self.response.status = 404
             self.response.write('Device link not found')
             return
@@ -45,11 +44,9 @@ class DeviceLinkStart(webapp2.RequestHandler):
         self.response.out.write(json.dumps(response))
 
     def post(self):
-        ddddebug = ndb.Key('Frame', 6333186975989760)
         device_link = DeviceLink(
                     device_ip = self.request.remote_addr,
                     secret=self.generate_secret(),
-                    frame_key=ddddebug
                     )
         device_link.put()
 
@@ -67,3 +64,40 @@ class DeviceLinkStart(webapp2.RequestHandler):
     def generate_secret(self):
         chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
         return ''.join(random.SystemRandom().choice(chars) for _ in range(4))
+
+class DeviceLinkAdmin(webapp2.RequestHandler):
+    """ Manage connecting a frame to a device from the admin console"""
+
+    def post(self, frame_id):
+        # Get the secret to match for the device link
+        secret = self.request.get('secret')
+        if (not secret):
+            self.response.status = 400
+            self.response.write('Device link secret is required')
+            return
+
+        frame_key = ndb.Key('Frame', int(frame_id))
+        frame = frame_key.get()
+
+        if (not frame.current_user_has_access()):
+            logging.warn('The user {user} tried to link device to the frame {frame} which he/she do not have access'.format(
+                user=users.get_current_user().user_id(),
+                frame=frame.key.id()
+            ))
+            self.response.status = 404
+            self.response.write('Frame not found')
+            return
+
+        device_link = DeviceLink.get_by_secret(secret)
+        if (not device_link):
+            logging.info('The user {user} tried to link a device but no DeviceLink was found for the secret specified'.format(
+                user=users.get_current_user().user_id(),
+            ))
+            self.response.status = 404
+            self.response.write('No frame match your secret')
+            return
+
+        # we have the frame and device to link
+        device_link.frame_key = frame_key
+        device_link.put()
+        self.response.write('ok')

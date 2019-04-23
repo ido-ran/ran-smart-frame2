@@ -12,6 +12,11 @@ indexes:
   - name: "created_by_user_id"
   - name: "updated_at"
     direction: desc
+- kind: "DeviceLink"
+  properties:
+  - name: "secret"
+  - name: "created_at"
+    direction: desc
 - kind: "Frame"
   properties:
   - name: "created_by_user_id"
