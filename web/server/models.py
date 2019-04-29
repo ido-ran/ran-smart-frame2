@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 
 from google.appengine.ext import ndb
 from google.appengine.api import users
@@ -94,7 +95,11 @@ class DeviceLink(ndb.Model):
     def get_by_secret(cls, secret):
         """ Get (if exists) the latest DeviceLink matching the secret that is valid """
         candidate = cls.query().filter(cls.secret == secret).order(-cls.created_at).get()
+        logging.info('found candidate DeviceLink {candidateId}'.format(
+            candidateId=candidate.key.id()
+        ))
         if candidate and not candidate.is_valid_to_link():
+            logging.info('found candidate DeviceLink {candidate} but it is not valid to link')
             candidate = None
         
         return candidate
@@ -104,9 +109,13 @@ class DeviceLink(ndb.Model):
         
         # If this DeviceLink is already linked, it is not valid for linking...
         if (self.frame_key):
+            logging.info('DeviceLink {id} is invalid because it is already linked to a frame {frameId}'.format(
+                id=self.key.id(),
+                frameId=self.frame_key.id()
+            ))
             return False
 
-        return not self.is_time_valid()
+        return self.is_time_valid()
 
     def is_time_valid(self):
         """ Check if this DeviceLink is still valid """
@@ -114,4 +123,7 @@ class DeviceLink(ndb.Model):
         time_delta = now - self.created_at
         minutes_since_created = time_delta.total_seconds() / 60
 
+        logging.info('DeviceLink is_time_valid delat {delta}'.format(
+            delta=minutes_since_created
+        ))
         return (minutes_since_created < 5)
