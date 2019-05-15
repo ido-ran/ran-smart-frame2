@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.oomkik.client.android">
-
-    <!--
-    Do not require touchscreen so that the app can run on TVs too.
-    -->
+    <!--     Do not require touchscreen so that the app can run on TVs too. -->
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
-
     <!--
     Declare we use leanback feature, but it is not required so that the app
     will run on mobile devices too.
@@ -18,27 +14,26 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-
     <!--
     The app uses the permission to be notified when the device finish booting
     to run the app.
     -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-    <!-- Those two permissions are required to run Android TV activity, not sure exactly why -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- Those two permissions are required to run Android TV activity, not sure exactly why -->
     <uses-permission android:name="com.google.android.assistant.READ_HOTWORD_STATE" />
     <uses-permission android:name="com.google.android.assistant.WRITE_HOTWORD_STATE" />
-    <!-- End of Android TV required permissions -->
 
     <application
         android:allowBackup="true"
+        android:banner="@drawable/tv_banner"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar"
-        android:banner="@drawable/tv_banner">
-
+        android:theme="@style/Theme.AppCompat.NoActionBar">
+        <activity
+            android:name=".DreamSettingsActivity"
+            android:label="@string/title_activity_dream_settings"
+            android:theme="@style/NoActionBar"></activity>
         <activity android:name=".SelectFrameActivity" /> <!-- Wire BOOT_COMPLETED even to BootReceiver which runs the app. -->
         <receiver android:name=".BootReceiver">
             <intent-filter>
@@ -60,14 +55,16 @@
             android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".TvActivity"
+        <activity
+            android:name=".TvActivity"
             android:banner="@drawable/tv_banner">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
@@ -79,8 +76,14 @@
             android:permission="android.permission.BIND_DREAM_SERVICE">
             <intent-filter>
                 <action android:name="android.service.dreams.DreamService" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
+            <!-- Point to additional information for this dream (optional) -->
+            <meta-data
+                android:name="android.service.dream"
+                android:resource="@xml/my_dream" />
         </service>
     </application>
 
