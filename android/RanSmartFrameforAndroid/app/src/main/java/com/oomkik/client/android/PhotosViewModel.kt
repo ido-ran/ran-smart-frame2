@@ -34,6 +34,7 @@ class PhotosViewModel(app: Application) : AndroidViewModel(app) {
             }
         } catch (e: Exception) {
             photos.value = listOf(
+                    "http://eskipaper.com/images/landscape-wallpaper-hd-33.jpg",
                     "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?cs=srgb&dl=beach-exotic-holiday-248797.jpg&fm=jpg",
                     "https://images.pexels.com/photos/260573/pexels-photo-260573.jpeg?cs=srgb&dl=beach-boat-island-260573.jpg&fm=jpg"
             )
