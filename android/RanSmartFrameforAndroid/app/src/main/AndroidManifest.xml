@@ -32,8 +32,7 @@
         android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity
             android:name=".DreamSettingsActivity"
-            android:label="@string/title_activity_dream_settings"
-            android:theme="@style/NoActionBar"></activity>
+            android:label="@string/title_activity_dream_settings"></activity>
         <activity android:name=".SelectFrameActivity" /> <!-- Wire BOOT_COMPLETED even to BootReceiver which runs the app. -->
         <receiver android:name=".BootReceiver">
             <intent-filter>
