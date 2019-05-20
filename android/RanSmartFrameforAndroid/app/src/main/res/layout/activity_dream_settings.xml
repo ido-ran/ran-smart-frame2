@@ -6,30 +6,55 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".DreamSettingsActivity" >
+    tools:context=".DreamSettingsActivity">
 
     <TextView
         android:id="@+id/secretLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="12dp"
         android:text="Secret"
         android:textSize="36sp"
-        tools:layout_editor_absoluteX="131dp"
-        tools:layout_editor_absoluteY="0dp" />
+        app:layout_constraintStart_toEndOf="@+id/secretLabelLabel"
+        app:layout_constraintTop_toBottomOf="@+id/explain" />
 
-    <Button
-        android:id="@+id/button1"
+    <TextView
+        android:id="@+id/secretLabelLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button1"
-        app:layout_constraintTop_toBottomOf="@+id/secretLabel" />
+        android:layout_marginStart="92dp"
+        android:layout_marginTop="12dp"
+        android:text="Secret:"
+        android:textSize="36sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/explain" />
+
+    <TextView
+        android:id="@+id/explain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:text="@string/dream_settings_explain"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/cancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Button2"
-        app:layout_constraintTop_toBottomOf="@+id/button1" />
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="8dp"
+        android:text="@android:string/cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_weight="44"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/secretLabelLabel" />
 
 </android.support.constraint.ConstraintLayout>

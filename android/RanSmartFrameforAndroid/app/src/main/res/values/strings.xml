@@ -2,6 +2,7 @@
     <string name="app_name">OomkiK</string>
 
     <string name="action_settings">Settings</string>
-    <string name="oomkik_day_drean_label">Oomkik Dream</string>
+    <string name="oomkik_day_drean_label">Oomkik</string>
     <string name="title_activity_dream_settings">DreamSettingsActivity</string>
+    <string name="dream_settings_explain">You are now in the process of linking your Oomkik Physical Frame (your device) to Oomkik Digital Frame. The secret value you see here is the key for your device linking. Open oomkik.com web site and select the Oomkik Digital Frame you will like to link to and enter that secret there.</string>
 </resources>

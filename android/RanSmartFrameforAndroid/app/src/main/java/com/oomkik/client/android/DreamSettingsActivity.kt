@@ -32,7 +32,7 @@ class DreamSettingsActivity : AppCompatActivity() {
 
         getPairDeviceCode()
 
-        button1.setOnClickListener {
+        cancelButton.setOnClickListener {
             this.finish()
         }
     }
