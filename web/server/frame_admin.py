@@ -22,6 +22,7 @@ from api.google_auth_api import GoogleAuthApi
 from api.google_albums_api import GoogleAlbumsApi
 from api.datastore_upgrade import DatastoreUpgrade
 from api.google_oauth_endpoint import GoogleOAuthEndpointApi
+from api.device_link import DeviceLinkAdmin
 
 app = webapp2.WSGIApplication([
 
@@ -45,6 +46,11 @@ app = webapp2.WSGIApplication([
 
     webapp2.Route(r'/public/api/frames/<id>', PublicApi),
     webapp2.Route(r'/public/api/frames/<frame_id>/streams/<stream_id>/photos/<photo_id>', PublicPhotoApi),
+
+    # This route is part of DeviceLink process. This route is used by the admin console
+    # after selecting a specific frame to link to a device and enter the secret presented
+    # on the device.
+    webapp2.Route(r'/api/frames/<frame_id>/link-device', DeviceLinkAdmin),    
 
     # Management
     webapp2.Route(r'/mgmt/upgrade/0001/stream-type', DatastoreUpgrade),

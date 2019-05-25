@@ -1,2 +1,3 @@
 web/server/dangare_secrets.py
 android/RanSmartFrameforAndroid/app/google-services.json
+*.aab
