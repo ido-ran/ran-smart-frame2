@@ -16,7 +16,7 @@ class PhotoInfo:
       'id': self.id
     }
 
-def get_stream_photos(stream):
+def get_stream_photos(stream, max_pages):
 
   if (stream.type == 'files'):
     photos_query = Photo.query(ancestor=stream.key)
@@ -26,7 +26,7 @@ def get_stream_photos(stream):
   elif (stream.type == 'google-photos-album'):
     google_auth = stream.google_auth_key.get()
     google_photos = GooglePhotos(google_auth)
-    photos = google_photos.get_album_photos(stream.google_album_id)
+    photos = google_photos.get_album_photos(stream.google_album_id, max_pages)
     return [PhotoInfo(photo['id']) for photo in photos]
 
   return photos

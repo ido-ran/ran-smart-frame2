@@ -23,7 +23,9 @@ class PhotosApi(webapp2.RequestHandler):
         stream_key = ndb.Key('Stream', int(stream_id))
         stream = stream_key.get()
 
-        photos = get_stream_photos(stream)
+        # because this API is for admin purposes, we fetch
+        # at most 2 pages of phtoos which means up-to 200 photos
+        photos = get_stream_photos(stream, 2)
 
         if (photos is None):
             self.response.status = 500

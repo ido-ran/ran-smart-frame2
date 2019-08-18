@@ -34,7 +34,8 @@ class PublicApi(webapp2.RequestHandler):
     def fetch_photos(stream_key):
         stream = stream_key.get()
 
-        photos = get_stream_photos(stream)
+        # Fetch up-to 5 pages of photos (100 photos each)
+        photos = get_stream_photos(stream, 5)
 
         return [g.serialize() for g in photos]
 

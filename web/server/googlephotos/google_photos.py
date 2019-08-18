@@ -39,18 +39,35 @@ class GooglePhotos:
     albums = results.get('albums', [])
     return albums
 
-  def get_album_photos(self, album_id):
+  def get_album_photos(self, album_id, max_pages):
     # Call the Photo v1 API
     # The search method is expecting a single kwarg name `body`.
     logger.info('Requesting Google Photos Album. albumId: %s', album_id)
-    results = self.service.mediaItems().search(
-      body = { 
-        'albumId': album_id,
-        'pageSize': 100, # request for the maximum of 100 photos per request
-      }
-    ).execute()
-    items = results.get('mediaItems', [])
-    return items
+
+    photos = []
+    page_token = ''
+    pages_fetched = 0
+
+    while pages_fetched == 0 or (page_token != '' and pages_fetched < max_pages):
+
+      logger.info('Requesting Google Photos Album. albumId: %s PageIndex: %d', album_id, pages_fetched)
+
+      results = self.service.mediaItems().search(
+        body = { 
+          'albumId': album_id,
+          'pageSize': 100, # request for the maximum of 100 photos per request
+          'pageToken': page_token,
+        }
+      ).execute()
+
+      items = results.get('mediaItems', [])
+      photos.extend(items)
+
+      # If we have nextPageToken we'll fetch it according to the max pages we are allowed to fetch
+      page_token = results.get('nextPageToken')
+      pages_fetched += 1
+
+    return photos
 
   def get_album_photo_url(self, photo_id):
     # Call the Photo v1 API
