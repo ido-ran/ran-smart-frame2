@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { Link  } from 'react-router'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
-
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import { List, ListItem, ListItemText } from '@material-ui/core';
-import Avatar from '@material-ui/core/Avatar';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { withStyles } from '@material-ui/core/styles';
 import { CropOriginal } from '@material-ui/icons';
 
@@ -43,9 +42,9 @@ class Frames extends Component {
           {frames.items.map(frame => (
             <ListItem button key={`stream${frame.name}`}
                       component={Link} to={`/frames/${frame.id}`}>
-              <Avatar>
+              <ListItemIcon>
                 <CropOriginal />
-              </Avatar>
+              </ListItemIcon>
               <ListItemText primary={frame.name} />
             </ListItem>
           ))}

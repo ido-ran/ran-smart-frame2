@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { Link  } from 'react-router'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
-import Button from '@material-ui/core/Button'
-import { List, ListItem, ListItemText } from '@material-ui/core';
-import Avatar from '@material-ui/core/Avatar';
+import { List, ListItem, ListItemText, ListItemIcon, Fab } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 import { withStyles } from '@material-ui/core/styles';
-import { CameraRoll } from '@material-ui/icons';
+import { AccountBox } from '@material-ui/icons';
 
 import { loadGoogleAuth, loadGoogleOAuthEndpoint } from './actions'
 
@@ -44,16 +43,20 @@ class AddGooglePhotoAlbum extends Component {
           {this.props.googleAuth.map(googleAuth => (
             <ListItem button key={`googleAuth${googleAuth.id}`}
                       component={Link} to={`/streams/add-google-photo-album/${googleAuth.external_user_id}`}>
-              <Avatar>
-                <CameraRoll />
-              </Avatar>
+              <ListItemIcon>
+                <AccountBox />
+              </ListItemIcon>
               <ListItemText primary={googleAuth.last_email} />
             </ListItem>
           ))}
         </List>
 
-        <Button color="primary" variant="contained"
-                component='a' href={googleOAuthEndpointLoaded ? googleOAuthEndpoint.oauth_endpoint : ''}>Connect to Google Photos</Button>
+        <Fab variant="extended" color="primary" aria-label="add" className={classes.fab} 
+                href={googleOAuthEndpointLoaded ? googleOAuthEndpoint.oauth_endpoint : ''}>
+          <AddIcon />
+          Connect to Google Photos
+        </Fab>
+
       </div>)
   }
 

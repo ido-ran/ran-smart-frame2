@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import {bindActionCreators} from 'redux';
-import { List, ListItem, ListItemText } from '@material-ui/core';
-import Avatar from '@material-ui/core/Avatar';
+import { bindActionCreators } from 'redux';
+import { withRouter } from 'react-router-dom'
+import { List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { CameraRoll } from '@material-ui/icons';
 
@@ -24,13 +24,13 @@ class SelectGooglePhotoAlbum extends Component {
   }
 
   componentWillMount() {
-    this.props.loadGoogleAlbums(this.props.params.externalUserId)
+    this.props.loadGoogleAlbums(this.props.match.params.externalUserId)
   }
 
   createStreamFromGoogleAlbum = googleAlbum => (event) => {
     event.preventDefault();
 
-    const googleAuth = this.props.params.externalUserId;
+    const googleAuth = this.props.match.params.externalUserId;
 
     const form = new FormData();
     form.append('googleAlbumId', googleAlbum.id)
@@ -40,9 +40,12 @@ class SelectGooglePhotoAlbum extends Component {
       method: "POST",
       body: form,
       credentials: 'include'
-    }).then((r) => {
-      console.log('album created', r)
-    });
+    }).then((r) => r.json())
+      .then(r => {
+        let { history } = this.props;
+        history.push(`/streams/${r.id}`);
+        console.log('album created', r)
+      });
   };
 
   render() {
@@ -53,12 +56,12 @@ class SelectGooglePhotoAlbum extends Component {
         <h1>Select Google Photos Album</h1>
 
         <List>
-        {this.props.googlePhotoAlbums.map(googleAlbum => (
+          {this.props.googlePhotoAlbums.map(googleAlbum => (
             <ListItem button key={`googleAlbum${googleAlbum.id}`}
-                      onClick={this.createStreamFromGoogleAlbum(googleAlbum)}>
-              <Avatar>
+              onClick={this.createStreamFromGoogleAlbum(googleAlbum)}>
+              <ListItemIcon>
                 <CameraRoll />
-              </Avatar>
+              </ListItemIcon>
               <ListItemText primary={googleAlbum.title} />
             </ListItem>
           ))}
@@ -69,9 +72,9 @@ class SelectGooglePhotoAlbum extends Component {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({
-      loadGoogleAlbums
-    }, dispatch);
+  return bindActionCreators({
+    loadGoogleAlbums
+  }, dispatch);
 }
 
 function mapStateToProps(state) {
@@ -81,7 +84,9 @@ function mapStateToProps(state) {
   };
 }
 
-export default withStyles(styles)(connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SelectGooglePhotoAlbum))
+export default withRouter(
+  withStyles(styles)(connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(SelectGooglePhotoAlbum))
+)

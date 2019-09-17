@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { List, ListItem, ListItemText } from '@material-ui/core';
 import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core/styles';
@@ -25,7 +25,7 @@ const styles = theme => ({
 class FrameStreams extends Component {
 
   componentWillMount() {
-    this.props.loadFrame(this.props.params.frameId)
+    this.props.loadFrame(this.props.match.params.frameId)
     this.props.loadStreams()
   }
 

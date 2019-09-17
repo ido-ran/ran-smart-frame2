@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
@@ -17,7 +17,7 @@ const styles = () => ({
 class Frame extends Component {
 
   componentWillMount() {
-    this.props.loadFrame(this.props.params.frameId)
+    this.props.loadFrame(this.props.match.params.frameId)
   }
 
   render() {
