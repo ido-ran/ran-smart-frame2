@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
-import { Link  } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import { withStyles } from '@material-ui/core/styles';
 import { GridList, GridListTile } from '@material-ui/core';
@@ -35,12 +35,12 @@ class Stream extends Component {
   }
 
   componentWillMount() {
-    this.props.loadStream(this.props.params.streamId)
+    this.props.loadStream(this.props.match.params.streamId)
     this._loadStreamPhotos();
   }
 
   _loadStreamPhotos() {
-    this.props.loadStreamPhotos(this.props.params.streamId)
+    this.props.loadStreamPhotos(this.props.match.params.streamId)
   }
 
   handleFileSelected(file) {
@@ -63,7 +63,7 @@ class Stream extends Component {
     var form = new FormData();
     form.append('image', file, 'filename.txt');
 
-    fetch(`/api/streams/${this.props.params.streamId}/photos`, {
+    fetch(`/api/streams/${this.props.match.params.streamId}/photos`, {
       method: "POST",
       body: form,
       credentials: 'include'
@@ -105,8 +105,8 @@ class Stream extends Component {
           </GridListTile>
           {photos.map(photo => (
             <GridListTile key={photo.id}>
-              <Link to={`/streams/${this.props.params.streamId}/photos/${photo.id}`}>
-                <img alt="thumbnail" src={`/api/streams/${this.props.params.streamId}/photos/${photo.id}/thumbnail`} />
+              <Link to={`/streams/${this.props.match.params.streamId}/photos/${photo.id}`}>
+                <img alt="thumbnail" src={`/api/streams/${this.props.match.params.streamId}/photos/${photo.id}/thumbnail`} />
               </Link>
             </GridListTile>
           ))}
