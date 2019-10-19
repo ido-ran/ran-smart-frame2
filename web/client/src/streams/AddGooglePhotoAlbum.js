@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 import Button from '@material-ui/core/Button'
-import { List, ListItem, ListItemText } from '@material-ui/core';
-import Avatar from '@material-ui/core/Avatar';
+import { List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { CameraRoll } from '@material-ui/icons';
 
@@ -44,9 +43,9 @@ class AddGooglePhotoAlbum extends Component {
           {this.props.googleAuth.map(googleAuth => (
             <ListItem button key={`googleAuth${googleAuth.id}`}
                       component={Link} to={`/streams/add-google-photo-album/${googleAuth.external_user_id}`}>
-              <Avatar>
+              <ListItemIcon>
                 <CameraRoll />
-              </Avatar>
+              </ListItemIcon>
               <ListItemText primary={googleAuth.last_email} />
             </ListItem>
           ))}

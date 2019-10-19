@@ -16,7 +16,6 @@ import Photo from './streams/Photo'
 import Frames from './frames/Frames'
 import Frame from './frames/Frame'
 import FrameStreams from './frames/FrameStreams'
-import SelectFrame from './select-frame/SelectFrame'
 import DeviceLink from './frames/DeviceLink'
 
 import './App.css';
@@ -107,18 +106,18 @@ class App extends Component {
             </div>
           </Drawer>
           <Switch>
-            <Route path="/streams/:streamId" component={Stream} />
-            <Route path="/streams/:streamId/photos/:photoId" component={Photo} />
-            <Route path="/streams/add-google-photo-album" component={AddGooglePhotoAlbum} />
-            <Route path="/streams/add-google-photo-album/:externalUserId" component={SelectGooglePhotoAlbum} />
-            <Route path="/streams" component={Streams} />
+            <Route exact path="/streams/add-google-photo-album" component={AddGooglePhotoAlbum} />
+            <Route exact path="/streams/add-google-photo-album/:externalUserId" component={SelectGooglePhotoAlbum} />
+            <Route exact path="/streams/:streamId" component={Stream} />
+            <Route exact path="/streams/:streamId/photos/:photoId" component={Photo} />
+            <Route exact path="/streams" component={Streams} />
 
-            <Route path="/frames" component={Frames} />
-            <Route path="/frames/:frameId" component={Frame} />
-            <Route path="/frames/:frameId/streams" component={FrameStreams} />
-            <Route path="/frames/:frameId/device-link" component={DeviceLink} />
+            <Route exact path="/frames" component={Frames} />
+            <Route exact path="/frames/:frameId" component={Frame} />
+            <Route exact path="/frames/:frameId/streams" component={FrameStreams} />
+            <Route exact path="/frames/:frameId/device-link" component={DeviceLink} />
 
-            <Route path="/select-frame" component={SelectFrame} />
+            {/* <Route path="/select-frame" component={SelectFrame} /> */}
           </Switch>
         </div>
       </BrowserRouter>
@@ -128,7 +127,7 @@ class App extends Component {
 
 const styles = theme => ({
   root: {
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     width: '100%',
   },
   flex: {

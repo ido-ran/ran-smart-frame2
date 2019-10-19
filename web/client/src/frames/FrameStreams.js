@@ -25,7 +25,7 @@ const styles = theme => ({
 class FrameStreams extends Component {
 
   componentWillMount() {
-    this.props.loadFrame(this.props.params.frameId)
+    this.props.loadFrame(this.props.match.params.frameId)
     this.props.loadStreams()
   }
 

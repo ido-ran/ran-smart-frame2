@@ -43,7 +43,7 @@ class DeviceLink extends Component {
   }
 
   componentWillMount() {
-    this.props.loadFrame(this.props.params.frameId)
+    this.props.loadFrame(this.props.match.params.frameId)
   }
 
   handleSecretChange(event) {
@@ -56,7 +56,7 @@ class DeviceLink extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    const { frameId } = this.props.params;
+    const { frameId } = this.props.match.params;
     const { secret } = this.state;
     var form = new FormData();
     form.append('secret', secret)

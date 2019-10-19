@@ -34,7 +34,7 @@ class Stream extends Component {
     this._loadStreamPhotos = this._loadStreamPhotos.bind(this)
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.loadStream(this.props.match.params.streamId)
     this._loadStreamPhotos();
   }
@@ -103,8 +103,8 @@ class Stream extends Component {
           <GridListTile key="Subheader" cols={5} style={{ height: 'auto' }}>
             <Subheader>{photosLoaded ? `${photos.length} Photos` : 'Loading...'}</Subheader>
           </GridListTile>
-          {photos.map(photo => (
-            <GridListTile key={photo.id}>
+          {photos.map((photo, index) => (
+            <GridListTile key={`${photo.id}-${index}`}>
               <Link to={`/streams/${this.props.match.params.streamId}/photos/${photo.id}`}>
                 <img alt="thumbnail" src={`/api/streams/${this.props.match.params.streamId}/photos/${photo.id}/thumbnail`} />
               </Link>

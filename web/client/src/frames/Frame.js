@@ -17,7 +17,7 @@ const styles = () => ({
 class Frame extends Component {
 
   componentWillMount() {
-    this.props.loadFrame(this.props.params.frameId)
+    this.props.loadFrame(this.props.match.params.frameId)
   }
 
   render() {
