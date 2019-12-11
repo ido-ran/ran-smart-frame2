@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
@@ -71,6 +72,10 @@ class PhotosViewModel(app: Application) : AndroidViewModel(app) {
                 Response.ErrorListener { error ->
                     Log.e("FullScreenActivity", "Fail to fetch frame data. " + error.message)
                 })
+
+        // Set the timeout to be very, very long since the server is currently
+        // loading image list in a very slow way.
+        request.retryPolicy = DefaultRetryPolicy(60 * 1000, 2, 3.0f)
 
         // Add the request to the RequestQueue.
         HttpSingleton.queue?.add(request)

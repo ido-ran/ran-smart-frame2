@@ -8,13 +8,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.oomkik.client.android"
         minSdkVersion 19
-        targetSdkVersion 26
-        versionCode 20
-        versionName "0.1.20"
+        targetSdkVersion 28
+        versionCode 21
+        versionName "0.1.21"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
